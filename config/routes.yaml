@@ -1,3 +1,13 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+api:
+  resource: ../src/Controller/
+  type: rest
+  defaults:
+    - _format: json
+
+index:
+  path: /
+  controller: App\Controller\DefaultController::indexAction
+
+export_download:
+  path: /download
+  controller: App\Controller\DownloadController::indexAction
