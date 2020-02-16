@@ -4,9 +4,12 @@ fos_rest:
     body_listener: true
     allowed_methods_listener: true
     routing_loader:
-      default_format: json
+        default_format: json
+        include_format: true
     view:
         view_response_listener: true
+        formats:
+            json: true
 
     format_listener:
         enabled: true

@@ -1,6 +1,6 @@
 sensio_framework_extra:
     router:
-        annotations: true
+        annotations: false
     view:
         annotations: true
     request:

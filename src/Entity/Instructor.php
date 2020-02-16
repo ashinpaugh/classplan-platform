@@ -13,9 +13,9 @@ use JMS\Serializer\Annotation as Serializer;
 class Instructor extends AbstractEntity
 {
     /**
-     * @Serializer\Exclude()
-     * 
      * @ORM\OneToMany(targetEntity="Section", mappedBy="instructor")
+     * @Serializer\Exclude()
+     *
      * @var Section[]
      */
     protected $sections;
@@ -24,7 +24,7 @@ class Instructor extends AbstractEntity
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\Column(type="bigint")
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Groups(groups={"instructor", "instructor_full"})
      * 
      * @var Integer
      */
@@ -32,7 +32,7 @@ class Instructor extends AbstractEntity
     
     /**
      * @ORM\Column(name="name", type="string")
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Groups(groups={"instructor", "instructor_full"})
      *
      * @var String
      */
@@ -40,6 +40,7 @@ class Instructor extends AbstractEntity
     
     /**
      * @ORM\Column(name="email", type="string", nullable=true)
+     *
      * @var String
      */
     protected $email;
@@ -59,16 +60,20 @@ class Instructor extends AbstractEntity
         
         $this->sections = new ArrayCollection();
     }
-    
+
     /**
-     * {@inheritdoc}
+     * @Serializer\VirtualProperty(name="sections")
+     * @Serializer\Groups(groups={"instructor_full"})
+     *
+     * @return int[]
      */
-    public function getKeyArr()
+    public function getSectionIds(): array
     {
-        return [
-            'id'   => $this->id,
-            'name' => $this->name,
-        ];
+        $collection = $this->sections->map(function (Section $section) {
+            return $section->getId();
+        });
+
+        return $collection->toArray();
     }
     
     /**

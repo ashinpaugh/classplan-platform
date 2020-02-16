@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use DateTime;
 use App\Entity\Section;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -22,7 +23,7 @@ class DownloadController extends AbstractController
      */
     public function indexAction(Request $request)
     {
-        $response = $this->forward('ATSScheduleBundle:Section:get', [], $request->query->all());
+        $response = $this->forward('App\Controller\Section::getAction', [], $request->query->all());
         $sections = json_decode($response->getContent(), true);
         $response = new StreamedResponse();
         
@@ -33,8 +34,8 @@ class DownloadController extends AbstractController
             
             /* @var Section $section */
             foreach ($sections['sections'] as $section) {
-                $sdate = new \DateTime($section['start']);
-                $edate = new \DateTime($section['end']);
+                $sdate = new DateTime($section['start']);
+                $edate = new DateTime($section['end']);
                 
                 fputcsv($handle, [
                     $section['subject']['name'],

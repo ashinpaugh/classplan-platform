@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Base command class.
@@ -16,6 +17,11 @@ abstract class AbstractCommand extends Command
     public function __construct(string $name = null)
     {
         parent::__construct($name);
+    }
+
+    public function setProjectDir(KernelInterface $kernel)
+    {
+        $this->projectDir = $kernel->getProjectDir();
     }
 
     /**

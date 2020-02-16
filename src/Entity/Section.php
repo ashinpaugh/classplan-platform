@@ -25,8 +25,8 @@ class Section extends AbstractEntity
     const ACTIVE    = 1;
     
     /**
-     * @ORM\ManyToOne(targetEntity="Subject", inversedBy="sections")
-     * @Serializer\MaxDepth(1)
+     * @ORM\ManyToOne(targetEntity="Subject", inversedBy="sections", fetch="EAGER")
+     * @Serializer\Groups(groups={"subject"})
      *
      * @var Subject
      */
@@ -34,25 +34,23 @@ class Section extends AbstractEntity
     
     /**
      * @ORM\ManyToOne(targetEntity="Course", inversedBy="sections")
-     * @Serializer\MaxDepth(1)
+     * @Serializer\Groups(groups={"course"})
      *
      * @var Course
      */
     protected $course;
     
     /**
-     * @Serializer\MaxDepth(1)
-     * @Serializer\Groups({"location"})
-     * 
      * @ORM\ManyToOne(targetEntity="Campus", inversedBy="sections", fetch="EAGER")
+     * @Serializer\Groups(groups={"campus"})
+     *
      * @var Campus
      */
     protected $campus;
     
     /**
-     * @ORM\ManyToOne(targetEntity="Room", inversedBy="sections", fetch="EAGER")
-     * @Serializer\MaxDepth(1)
-     * @Serializer\Groups({"location"})
+     * @ORM\ManyToOne(targetEntity="Room", inversedBy="sections", fetch="LAZY")
+     * @Serializer\Groups(groups={"room"})
      *
      * @var Room
      */
@@ -60,8 +58,7 @@ class Section extends AbstractEntity
     
     /**
      * @ORM\ManyToOne(targetEntity="Instructor", inversedBy="sections", fetch="EAGER")
-     * @Serializer\MaxDepth(1)
-     * @Serializer\Groups({"instructor"})
+     * @Serializer\Groups(groups={"instructor"})
      * 
      * @var Instructor
      */
@@ -69,6 +66,8 @@ class Section extends AbstractEntity
     
     /**
      * @ORM\ManyToOne(targetEntity="TermBlock")
+     * @Serializer\Groups({"section_full"})
+     *
      * @var TermBlock
      */
     protected $block;
@@ -77,7 +76,7 @@ class Section extends AbstractEntity
      * @ORM\Id()
      * @ORM\Column(name="id", type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Groups({"default", "course", "instructor"})
+     * @Serializer\Groups({"section", "section_full"})
      * 
      * @var Integer
      */
@@ -87,6 +86,7 @@ class Section extends AbstractEntity
      * The class CRN.
      * 
      * @ORM\Column(type="integer")
+     * @Serializer\Groups({"section", "section_full"})
      * 
      * @var Integer
      */
@@ -94,56 +94,72 @@ class Section extends AbstractEntity
     
     /**
      * @ORM\Column(type="smallint")
+     * @Serializer\Groups({"section", "section_full"})
+     *
      * @var Integer
      */
     protected $status;
     
     /**
      * @ORM\Column(type="string", length=3)
+     * @Serializer\Groups({"section", "section_full"})
+     *
      * @var Integer
      */
     protected $number;
     
     /**
      * @ORM\Column(type="string", nullable=true)
+     * @Serializer\Groups({"section", "section_full"})
+     *
      * @var String
      */
     protected $days;
     
     /**
-     * @Serializer\Exclude()
      * @ORM\Column(type="date")
+     * @Serializer\Exclude()
+     *
      * @var \DateTime
      */
     protected $start_date;
     
     /**
-     * @Serializer\Exclude()
      * @ORM\Column(type="date")
+     * @Serializer\Exclude()
+     *
      * @var \DateTime
      */
     protected $end_date;
     
     /**
      * @ORM\Column(type="string")
+     * @Serializer\Groups({"section", "section_full"})
+     *
      * @var string
      */
     protected $start_time;
     
     /**
      * @ORM\Column(type="string")
+     * @Serializer\Groups({"section", "section_full"})
+     *
      * @var string
      */
     protected $end_time;
     
     /**
      * @ORM\Column(type="integer")
+     * @Serializer\Groups({"section", "section_full"})
+     *
      * @var integer
      */
     protected $num_enrolled;
     
     /**
      * @ORM\Column(type="integer")
+     * @Serializer\Groups({"section", "section_full"})
+     *
      * @var Integer
      */
     protected $maximum_enrollment;
@@ -153,12 +169,15 @@ class Section extends AbstractEntity
      * because exams aren't included in TheBook imports.
      * 
      * @ORM\Column(type="smallint", options={"default": 1})
+     * @Serializer\Groups({"section", "section_full"})
+     *
      * @var String
      */
     protected $meeting_type;
     
     /**
      * @Serializer\VirtualProperty()
+     * @Serializer\Groups({"section_full"})
      */
     public function getBuilding()
     {
@@ -167,31 +186,24 @@ class Section extends AbstractEntity
     
     /**
      * @Serializer\VirtualProperty()
+     * @Serializer\Groups({"section", "section_full"})
      */
     public function getEnd()
     {
-        return $this->formatTime($this->end_date, $this->end_time);
+        // return $this->formatTime($this->end_date, $this->end_time);
+        return $this->end_date->format('Y-m-d');
     }
     
     /**
      * @Serializer\VirtualProperty()
+     * @Serializer\Groups({"section", "section_full"})
      */
     public function getStart()
     {
-        return $this->formatTime($this->start_date, $this->start_time);
+        // return $this->formatTime($this->start_date, $this->start_time);
+        return $this->start_date->format('Y-m-d');
     }
-    
-    /**
-     * {@inheritdoc}
-     */
-    public function getKeyArr()
-    {
-        return [
-            'crn'      => $this->crn,
-            'semester' => $this->getBlock()->getId(),
-        ];
-    }
-    
+
     /**
      * Return an ISO8601 formatted date.
      * 
@@ -206,7 +218,7 @@ class Section extends AbstractEntity
         $time   = 3 === strlen($time) ? '0' . $time : $time;
         $hour   = (int) substr($time, 0, 2);
         $minute = (int) substr($time, 2);
-        
+
         return $date->setTime($hour, $minute)->format('c');
     }
     
@@ -582,6 +594,9 @@ class Section extends AbstractEntity
     }
     
     /**
+     * @Serializer\VirtualProperty()
+     * @Serializer\Groups(groups={"section_full"})
+     *
      * @return String
      */
     public function getMeetingTypeStr()

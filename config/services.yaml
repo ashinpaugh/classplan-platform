@@ -27,6 +27,16 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    App\Command\ImportCommand:
+        calls:
+            - [ setProjectDir, [ "@kernel" ] ]
+    App\Command\SetupCommand:
+        calls:
+            - [ setProjectDir, [ "@kernel" ] ]
+    App\Command\UpdateBuildingsCommand:
+        calls:
+            - [ setProjectDir, [ "@kernel" ] ]
+
     App\Util\ImportDriverHelper:
         public: true
         calls:
@@ -37,3 +47,4 @@ services:
 
     App\Util\OdsImportDriver:
         public: true
+

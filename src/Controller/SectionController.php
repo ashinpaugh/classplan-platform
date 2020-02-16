@@ -8,6 +8,7 @@ use App\Entity\Section;
 use App\Entity\Subject;
 use App\Entity\TermBlock;
 use FOS\RestBundle\Request\ParamFetcher;
+use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\Operation;
 use Swagger\Annotations as SWG;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -22,8 +23,28 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  * 
  * @author Austin Shinpaugh <ashinpaugh@ou.edu>
  */
-class SectionController extends AbstractController
+class SectionController extends AbstractController implements ClassResourceInterface
 {
+    /**
+     * @Rest\Route("/section/{id}", requirements={
+     *     "id": "\d+",
+     * })
+     *
+     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"section_full", "subject", "course", "campus", "building", "room", "instructor"})
+     *
+     * @param int $id
+     *
+     * @return array
+     */
+    public function getAction(int $id)
+    {
+        $section = $this->getRepo(Section::class)
+            ->find($id)
+        ;
+
+        return ['section' => $section];
+    }
+
     /**
      * Fetch a subset of sections based on the provided filter criteria.
      * 
@@ -31,28 +52,28 @@ class SectionController extends AbstractController
      *     tags={""},
      *     summary="Fetch a subset of sections based on the provided filter criteria.",
      *     @SWG\Parameter(
-     *         name="blockId",
+     *         name="block",
      *         in="query",
      *         description="The block ID(s).",
      *         required=false,
      *         type="string"
      *     ),
      *     @SWG\Parameter(
-     *         name="subjectId",
+     *         name="subject",
      *         in="query",
      *         description="Optional. The subject ID(s).",
      *         required=false,
      *         type="string"
      *     ),
      *     @SWG\Parameter(
-     *         name="instructorId",
+     *         name="instructor",
      *         in="query",
      *         description="Optional. The instructor ID(s) to filter on.",
      *         required=false,
      *         type="string"
      *     ),
      *     @SWG\Parameter(
-     *         name="courseId",
+     *         name="course",
      *         in="query",
      *         description="Optional. The course number ID(s) to filter on.",
      *         required=false,
@@ -71,16 +92,16 @@ class SectionController extends AbstractController
      *     )
      * )
      *
-     * @Rest\QueryParam(name="blockId", nullable=false, description="The block ID(s).")
-     * @Rest\QueryParam(name="subjectId", nullable=true,  description="Optional. The subject ID(s).")
-     * @Rest\QueryParam(name="instructorId", nullable=true,  description="Optional. The instructor ID(s) to filter on.")
-     * @Rest\QueryParam(name="courseId", nullable=true,  description="Optional. The course number ID(s) to filter on.")
-     * @Rest\QueryParam(name="update", nullable=false, description="The date that the other IDs were created on.")
+     * @Rest\QueryParam(name="block", nullable=false, description="The block ID(s).")
+     * @Rest\QueryParam(name="subject", nullable=true,  description="Optional. The subject ID(s).")
+     * @Rest\QueryParam(name="instructor", nullable=true,  description="Optional. The instructor ID(s) to filter on.")
+     * @Rest\QueryParam(name="course", nullable=true,  description="Optional. The course number ID(s) to filter on.")
+     * @Rest\QueryParam(name="update", nullable=true, description="The date that the other IDs were created on.")
      *
      * 
-     * @Rest\Route("/section")
+     * @Rest\Route("/section/find", methods={"POST"})
      * 
-     * @Rest\View(serializerEnableMaxDepthChecks=true)
+     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"section_full", "subject", "course", "campus", "building", "room", "instructor"})
      * @Cache(public=true, expires="+10 minutes", maxage=600, smaxage=600)
      * 
      * @param Request      $request
@@ -88,36 +109,38 @@ class SectionController extends AbstractController
      * 
      * @return array
      */
-    public function getAction(Request $request, ParamFetcher $fetcher)
+    public function findAction(Request $request, ParamFetcher $fetcher)
     {
         $block       = null;
         $subject     = null;
         $course      = null;
         $instructor  = null;
         
-        if (!$this->checkTimestamp($fetcher->get('u'))) {
+        /*if (!$this->checkTimestamp($fetcher->get('u'))) {
             throw new ConflictHttpException();
-        }
+        }*/
+
+        // print_r($request->request->all());die;
         
-        if ($block_id = $fetcher->get('blockId')) {
+        if ($block_id = $request->request->get('block')) {
             $block = $this->getRepo(TermBlock::class)
                 ->findById($block_id)
             ;
         }
         
-        if ($instructor_id = $fetcher->get('instructorId')) {
+        if ($instructor_id = $request->request->get('instructor')) {
             $instructor = $this->getRepo(Instructor::class)
                 ->findById($instructor_id)
             ;
         }
         
-        if ($subject_id = $fetcher->get('subjectId')) {
+        if ($subject_id = $request->request->get('subject')) {
             $subject = $this->getRepo(Subject::class)
                 ->findById($subject_id)
             ;
         }
         
-        if ($course_id = $fetcher->get('courseId')) {
+        if ($course_id = $request->request->get('course')) {
             $course = $this->getRepo(Course::class)
                 ->findById($course_id)
             ;

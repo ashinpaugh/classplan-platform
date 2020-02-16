@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Util\Debug;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
@@ -11,10 +12,9 @@ use JMS\Serializer\Annotation as Serializer;
 class TermBlock extends AbstractEntity
 {
     /**
-     * @Serializer\MaxDepth(1)
-     * 
      * @ORM\ManyToOne(targetEntity="Term", inversedBy="blocks", fetch="EXTRA_LAZY", cascade={"persist"})
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Groups(groups={"block_full", "section_full"})
+     * @Serializer\MaxDepth(1)
      *
      * @var Term
      */
@@ -24,19 +24,21 @@ class TermBlock extends AbstractEntity
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Groups(groups={"block", "block_full", "term", "term_full", "section_full"})
      * 
      * @var Integer
      */
     protected $id;
     
     /**
+     * The book provides the full name, ODS provides an abbreviation.
+     *
      * @ORM\Column(type="string")
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Exclude()
      *
      * @var String
      */
-    protected $name;
+    protected $short_name;
     
     /**
      * TermBlock constructor.
@@ -48,28 +50,26 @@ class TermBlock extends AbstractEntity
     {
         $this
             ->setTerm($term)
-            ->setName($name)
+            ->setShortName($name)
         ;
     }
-    
-    /**
-     * {@inheritdoc}
-     */
-    public function getKeyArr()
-    {
-        return [
-            'term' => $this->getTerm()->getName(),
-            'name' => $this->name,
-        ];
-    }
-    
+
     /**
      * @Serializer\VirtualProperty()
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Groups(groups={"block"})
      */
-    public function getDisplayName()
+    public function getTermId(): int
     {
-        switch ($this->getName()) {
+        return $this->term->getId();
+    }
+
+    /**
+     * @Serializer\VirtualProperty()
+     * @Serializer\Groups(groups={"block", "block_full", "term", "term_full", "section_full"})
+     */
+    public function getName()
+    {
+        switch ($this->getShortName()) {
             case 1:
                 return 'Full Semester';
             case 2:
@@ -92,7 +92,7 @@ class TermBlock extends AbstractEntity
             case 'L03':
                 return 'Liberal Studies 3';
             default:
-                return $this->getName();
+                return $this->getShortName();
         }
     }
     
@@ -127,9 +127,9 @@ class TermBlock extends AbstractEntity
     /**
      * @return String
      */
-    public function getName()
+    public function getShortName()
     {
-        return $this->name;
+        return $this->short_name;
     }
     
     /**
@@ -137,13 +137,13 @@ class TermBlock extends AbstractEntity
      *
      * @return TermBlock
      */
-    public function setName($name)
+    public function setShortName(string $name)
     {
         if ('exam' === strtolower($name)) {
             $name = 4;
         }
         
-        $this->name = $name;
+        $this->short_name = $name;
         
         return $this;
     }

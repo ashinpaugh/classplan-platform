@@ -301,11 +301,11 @@ abstract class AbstractDataFixture extends Fixture implements FixtureInterface, 
     protected function getKey($object)
     {
         if ($object instanceof Campus) {
-            return 'c-' . $object->getName();
+            return 'c-' . $object->getShortName();
         }
         
         if ($object instanceof Building) {
-            return $this->getKey($object->getCampus()) . '_b-' . $object->getName();
+            return $this->getKey($object->getCampus()) . '_b-' . $object->getShortName();
         }
         
         if ($object instanceof Room) {
@@ -321,7 +321,7 @@ abstract class AbstractDataFixture extends Fixture implements FixtureInterface, 
         }
         
         if ($object instanceof TermBlock) {
-            return $this->getKey($object->getTerm()) . '_b-' . $object->getName();
+            return $this->getKey($object->getTerm()) . '_b-' . $object->getShortName();
         }
         
         if ($object instanceof Subject) {

@@ -18,7 +18,7 @@ class Term extends AbstractEntity
      * @Serializer\MaxDepth(2)
      * 
      * @ORM\OneToMany(targetEntity="TermBlock", mappedBy="term", fetch="EAGER", cascade={"detach"})
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Groups(groups={"term", "term_full"})
      *
      * @var TermBlock[]
      */
@@ -28,7 +28,7 @@ class Term extends AbstractEntity
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Groups(groups={"term", "term_full", "block_full", "section_full"})
      * 
      * @var Integer
      */
@@ -36,7 +36,7 @@ class Term extends AbstractEntity
     
     /**
      * @ORM\Column(type="string")
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Groups(groups={"term", "term_full", "block_full", "section_full"})
      *
      * @var String
      */
@@ -44,7 +44,7 @@ class Term extends AbstractEntity
     
     /**
      * @ORM\Column(type="integer")
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Groups(groups={"term", "term_full", "block_full", "section_full"})
      *
      * @var Integer
      */
@@ -52,7 +52,7 @@ class Term extends AbstractEntity
     
     /**
      * @ORM\Column(type="string")
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Groups(groups={"term", "term_full", "block_full", "section_full"})
      *
      * @var String
      */
@@ -72,17 +72,6 @@ class Term extends AbstractEntity
         $this->year     = $year;
         $this->semester = $semester;
         $this->blocks   = new ArrayCollection();
-    }
-    
-    /**
-     * {@inheritdoc}
-     */
-    public function getKeyArr()
-    {
-        return [
-            'year'     => $this->year,
-            'semester' => $this->semester,
-        ];
     }
     
     /**

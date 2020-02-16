@@ -11,3 +11,4 @@ jms_serializer:
 #            another-name:
 #                namespace_prefix: "My\\BarBundle"
 #                path: "@MyBarBundle/Resources/config/serializer"
+

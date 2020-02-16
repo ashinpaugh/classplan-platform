@@ -25,14 +25,11 @@ class SetupCommand extends AbstractCommand
      */
     protected $doctrine;
 
-    public function __construct(
-        EntityManagerInterface $doctrine,
-        KernelInterface $kernel
-    ) {
+    public function __construct(EntityManagerInterface $doctrine)
+    {
         parent::__construct('classplan:setup');
 
         $this->doctrine = $doctrine;
-        $this->projectDir = $kernel->getProjectDir();
     }
 
     /**
@@ -43,7 +40,6 @@ class SetupCommand extends AbstractCommand
         parent::configure();
 
         $this
-            ->setName('classplan:setup')
             ->setDescription('Initialize the app settings.')
             ->addOption('import', 'i', InputOption::VALUE_NONE, 'Runs the <info>schedule:import</info> command with the default settings.')
             ->addOption('reset', '', InputOption::VALUE_NONE, 'Drops the tables currently in the database.')

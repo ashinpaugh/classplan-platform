@@ -1,8 +1,7 @@
 api:
   resource: ../src/Controller/
   type: rest
-  defaults:
-    - _format: json
+  defaults: { _format: json }
 
 index:
   path: /

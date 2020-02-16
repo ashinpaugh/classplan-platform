@@ -10,23 +10,23 @@ use JMS\Serializer\Annotation as Serializer;
 /**
  * @ORM\Entity()
  * @ORM\Table(name="campus", indexes={
- *    @ORM\Index(name="idx_name", columns={"name"})
+ *    @ORM\Index(name="idx_name", columns={"short_name"})
  * })
  */
 class Campus extends AbstractEntity
 {
     /**
-     * @Serializer\Exclude()
-     * 
      * @ORM\OneToMany(targetEntity="Building", mappedBy="campus", cascade={"all"})
+     * @Serializer\Exclude()
+     *
      * @var Building[]
      */
     protected $buildings;
     
     /**
-     * @Serializer\Exclude()
-     * 
      * @ORM\OneToMany(targetEntity="Section", mappedBy="campus")
+     * @Serializer\Exclude()
+     *
      * @var Section[]
      */
     protected $sections;
@@ -35,20 +35,19 @@ class Campus extends AbstractEntity
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(name="id", type="bigint")
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Groups(groups={"campus", "campus_full", "building_full"})
      * 
      * @var Integer
      */
     protected $id;
     
     /**
-     * 
      * @ORM\Column(type="string")
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Exclude()
      *
      * @var String
      */
-    protected $name;
+    protected $short_name;
     
     /**
      * Campus constructor.
@@ -57,29 +56,34 @@ class Campus extends AbstractEntity
      */
     public function __construct($name)
     {
-        $this->setName($name);
+        $this->setShortName($name);
         
         $this->buildings = new ArrayCollection();
         $this->sections  = new ArrayCollection();
     }
-    
+
     /**
-     * {@inheritdoc}
+     * @Serializer\VirtualProperty(name="buildings")
+     * @Serializer\Groups(groups={"campus_full"})
+     *
+     * @return int[]
      */
-    public function getKeyArr()
+    public function getBuildingIds(): array
     {
-        return [
-            'name' => $this->name,
-        ];
+        $collection = $this->buildings->map(function (Building $building) {
+            return $building->getId();
+        });
+
+        return $collection->toArray();
     }
     
     /**
      * @Serializer\VirtualProperty()
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Groups(groups={"campus", "building_full"})
      */
-    public function getDisplayName()
+    public function getName()
     {
-        switch ($this->getName()) {
+        switch ($this->getShortName()) {
             case 'A':
                 return 'Advanced Programs';
             case 'H':
@@ -101,7 +105,7 @@ class Campus extends AbstractEntity
             case 'J':
                 return 'Janux Campus';
             default:
-                return $this->getName();
+                return $this->getShortName();
         }
     }
     
@@ -128,19 +132,19 @@ class Campus extends AbstractEntity
     /**
      * @return mixed
      */
-    public function getName()
+    public function getShortName()
     {
-        return $this->name;
+        return $this->short_name;
     }
     
     /**
-     * @param mixed $name
+     * @param mixed $short_name
      *
      * @return Campus
      */
-    public function setName($name)
+    public function setShortName(string $short_name)
     {
-        $this->name = Encoding::toUTF8($name);
+        $this->short_name = Encoding::toUTF8($short_name);
         
         return $this;
     }

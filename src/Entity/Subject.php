@@ -8,7 +8,7 @@ use ForceUTF8\Encoding;
 use JMS\Serializer\Annotation as Serializer;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="App\Repository\SubjectRepository")
  * @ORM\Table(name="subject", indexes={
  *    @ORM\Index(name="idx_name", columns={"name"})
  * })
@@ -17,7 +17,7 @@ class Subject extends AbstractEntity
 {
     /**
      * @ORM\OneToMany(targetEntity="Course", mappedBy="subject", cascade={"persist"}, fetch="EXTRA_LAZY")
-     * @Serializer\Groups(groups={"subject_courses"})
+     * @Serializer\Exclude()
      *
      * @var Course[]
      */
@@ -25,7 +25,7 @@ class Subject extends AbstractEntity
     
     /**
      * @ORM\OneToMany(targetEntity="Section", mappedBy="subject", cascade={"persist"}, fetch="EXTRA_LAZY")
-     * @Serializer\Groups(groups={"subject_sections"})
+     * @Serializer\Exclude()
      *
      * @var Section[]
      */
@@ -35,7 +35,7 @@ class Subject extends AbstractEntity
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
-     * @Serializer\Groups(groups={"course", "default", "full"})
+     * @Serializer\Groups(groups={"subject", "subject_full"})
      *
      * @var Integer
      */
@@ -43,7 +43,7 @@ class Subject extends AbstractEntity
     
     /**
      * @ORM\Column(type="string", unique=true)
-     * @Serializer\Groups(groups={"default", "full"})
+     * @Serializer\Groups(groups={"subject", "subject_full"})
      *
      * @var String
      */
@@ -61,15 +61,35 @@ class Subject extends AbstractEntity
         $this->courses  = new ArrayCollection();
         $this->sections = new ArrayCollection();
     }
-    
+
     /**
-     * {@inheritdoc}
+     * @Serializer\VirtualProperty(name="courses")
+     * @Serializer\Groups(groups={"subject_full"})
+     *
+     * @return int[]
      */
-    public function getKeyArr()
+    public function getCourseIds(): array
     {
-        return [
-            'name' => $this->name,
-        ];
+        $collection = $this->courses->map(function (Course $course) {
+            return (int) $course->getId();
+        });
+
+        return $collection->toArray();
+	}
+
+    /**
+     * @Serializer\VirtualProperty(name="sections")
+     * @Serializer\Groups(groups={"subject_full"})
+     *
+     * @return int[]
+     */
+    public function getSectionIds(): array
+    {
+        $collection = $this->sections->map(function (Section $section) {
+            return $section->getId();
+        });
+
+        return $collection->toArray();
     }
     
     /**

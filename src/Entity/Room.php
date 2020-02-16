@@ -17,7 +17,7 @@ class Room extends AbstractEntity
 {
     /**
      * @ORM\ManyToOne(targetEntity="Building", inversedBy="rooms", fetch="EAGER")
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Groups(groups={"room_full"})
      * 
      * @var Building
      */
@@ -25,7 +25,7 @@ class Room extends AbstractEntity
     
     /**
      * @ORM\OneToMany(targetEntity="Section", mappedBy="room")
-     * @Serializer\Exclude()
+     * @Serializer\Groups(groups={"room_full"})
      *
      * @var Section[]
      */
@@ -35,7 +35,7 @@ class Room extends AbstractEntity
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(name="id", type="integer")
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Groups(groups={"room", "room_full"})
      * 
      * @var string
      */
@@ -43,7 +43,7 @@ class Room extends AbstractEntity
     
     /**
      * @ORM\Column(type="string")
-     * @Serializer\Groups(groups={"default"})
+     * @Serializer\Groups(groups={"room", "room_full"})
      *
      * @var string
      */
@@ -61,17 +61,6 @@ class Room extends AbstractEntity
         
         $this->building = $building;
         $this->sections = new ArrayCollection();
-    }
-    
-    /**
-     * {@inheritdoc}
-     */
-    public function getKeyArr()
-    {
-        return [
-            'number'   => $this->number,
-            'building' => $this->getBuilding()->getName(),
-        ];
     }
     
     /**

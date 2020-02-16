@@ -174,14 +174,4 @@ class UpdateLog extends AbstractEntity
         
         return $this;
     }
-    
-    /**
-     * Returns an array of identifiable information.
-     *
-     * @return array
-     */
-    public function getKeyArr()
-    {
-        return [];
-    }
 }

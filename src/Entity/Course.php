@@ -106,17 +106,6 @@ class Course extends AbstractEntity
     }
     
     /**
-     * {@inheritdoc}
-     */
-    public function getKeyArr()
-    {
-        return [
-            'subject' => $this->getSubject()->getName(),
-            'number'  => $this->number,
-        ];
-    }
-    
-    /**
      * @return Section[]
      */
     public function getSections()

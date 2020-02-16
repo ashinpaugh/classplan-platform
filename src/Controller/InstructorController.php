@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Instructor;
+use App\Entity\TermBlock;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Routing\ClassResourceInterface;
@@ -15,13 +16,13 @@ use FOS\RestBundle\Controller\Annotations as Rest;
  * 
  * @author Austin Shinpaugh <ashinpaugh@ou.edu>
  */
-class InstructorController extends AbstractController
+class InstructorController extends AbstractController implements ClassResourceInterface
 {
     /**
      * Fetches all the known instructors.
      *
      * @Rest\Route("/instructors")
-     * @Rest\View(serializerEnableMaxDepthChecks=true)
+     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"instructor"})
      */
     public function cgetAction()
     {
@@ -35,8 +36,11 @@ class InstructorController extends AbstractController
     /**
      * Get all the sections taught by an instructor.
      *
-     * @Rest\Route("/instructor")
-     * @Rest\View(serializerEnableMaxDepthChecks=true)
+     * @Rest\Route("/instructor/{id}", requirements={
+     *     "id": "\d+"
+     * })
+     *
+     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"instructor_full"})
      * 
      * @QueryParam(
      *     name="id",
@@ -46,10 +50,10 @@ class InstructorController extends AbstractController
      *     allowBlank=false
      * )
      */
-    public function getAction(ParamFetcher $fetcher)
+    public function getAction(int $id)
     {
         $instructor = $this->getRepo(Instructor::class)
-            ->find($fetcher->get('id'))
+            ->find($id)
         ;
         
         if (!$instructor instanceof Instructor) {
@@ -62,15 +66,21 @@ class InstructorController extends AbstractController
     /**
      * Fetches all the known instructors and groups them by subject name.
      *
-     * @Rest\Route("/instructor/by-subject")
-     * @Rest\View(serializerEnableMaxDepthChecks=true)
+     * @Rest\Route("/instructor/{block}/subjects", requirements={
+     *     "block": "\d+"
+     * })
+     *
+     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"instructor", "block_full"})
      */
-    public function getBySubjectAction()
+    public function getSubjectAction(TermBlock $block)
     {
         $instructors = $this->getRepo(Instructor::class)
-            ->getInstructorsBySubject()
+            ->getInstructorsBySubject($block)
         ;
         
-        return ['instructors' => $instructors];
+        return [
+            'block'       => $block,
+            'instructors' => $instructors
+        ];
     }
 }

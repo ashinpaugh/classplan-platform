@@ -54,13 +54,10 @@ class CourseController extends AbstractController implements ClassResourceInterf
      *     )
      * )
      *
-     * @Rest\Route(
-     *     "/course",
-     *     requirements={
-     *      "subject_id": "\d+",
-     *      "course_id":  "\d+"
-     *     }
-     * )
+     * @Rest\Route("/course", requirements={
+     *     "subject": "\d+",
+     *     "course":  "\d+"
+     * })
      *
      * @Rest\QueryParam(
      *     name="subject",
