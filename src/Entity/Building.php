@@ -234,7 +234,7 @@ class Building extends AbstractEntity
     /**
      * @return string
      */
-    public function getCode(): string
+    public function getCode(): ?string
     {
         return $this->code;
     }

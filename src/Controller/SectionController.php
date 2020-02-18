@@ -8,11 +8,13 @@ use App\Entity\Section;
 use App\Entity\Subject;
 use App\Entity\TermBlock;
 use FOS\RestBundle\Request\ParamFetcher;
+use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\Operation;
 use Swagger\Annotations as SWG;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
@@ -56,35 +58,35 @@ class SectionController extends AbstractController implements ClassResourceInter
      *         in="query",
      *         description="The block ID(s).",
      *         required=false,
-     *         type="string"
+     *         type="array"
      *     ),
      *     @SWG\Parameter(
      *         name="subject",
      *         in="query",
      *         description="Optional. The subject ID(s).",
      *         required=false,
-     *         type="string"
+     *         type="array"
      *     ),
      *     @SWG\Parameter(
      *         name="instructor",
      *         in="query",
      *         description="Optional. The instructor ID(s) to filter on.",
      *         required=false,
-     *         type="string"
+     *         type="array"
      *     ),
      *     @SWG\Parameter(
      *         name="course",
      *         in="query",
      *         description="Optional. The course number ID(s) to filter on.",
      *         required=false,
-     *         type="string"
+     *         type="array"
      *     ),
      *     @SWG\Parameter(
      *         name="update",
      *         in="query",
      *         description="The date that the other IDs were created on.",
      *         required=false,
-     *         type="string"
+     *         type="integer"
      *     ),
      *     @SWG\Response(
      *         response="200",
@@ -92,15 +94,44 @@ class SectionController extends AbstractController implements ClassResourceInter
      *     )
      * )
      *
-     * @Rest\QueryParam(name="block", nullable=false, description="The block ID(s).")
-     * @Rest\QueryParam(name="subject", nullable=true,  description="Optional. The subject ID(s).")
-     * @Rest\QueryParam(name="instructor", nullable=true,  description="Optional. The instructor ID(s) to filter on.")
-     * @Rest\QueryParam(name="course", nullable=true,  description="Optional. The course number ID(s) to filter on.")
-     * @Rest\QueryParam(name="update", nullable=true, description="The date that the other IDs were created on.")
-     *
+     * @Rest\RequestParam(
+     *     name="block",
+     *     map=true,
+     *     nullable=false,
+     *     requirements="\d+",
+     *     description="The block ID(s)."
+     * )
+     * @Rest\RequestParam(
+     *     name="subject",
+     *     map=true,
+     *     nullable=true,
+     *     requirements="\d+",
+     *     description="Optional. The subject ID(s)."
+     * )
+     * @Rest\RequestParam(
+     *     name="instructor",
+     *     map=true,
+     *     nullable=true,
+     *     requirements="\d+",
+     *     description="Optional. The instructor ID(s) to filter on."
+     * )
+     * @Rest\RequestParam(
+     *     name="course",
+     *     map=true,
+     *     nullable=true,
+     *     requirements="\d+",
+     *     description="Optional. The course number ID(s) to filter on."
+     * )
+     * @Rest\RequestParam(
+     *     name="update",
+     *     map=true,
+     *     nullable=true,
+     *     requirements="\d+",
+     *     description="The date that the other IDs were created on."
+     * )
      * 
      * @Rest\Route("/section/find", methods={"POST"})
-     * 
+     *
      * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"section_full", "subject", "course", "campus", "building", "room", "instructor"})
      * @Cache(public=true, expires="+10 minutes", maxage=600, smaxage=600)
      * 
@@ -109,7 +140,7 @@ class SectionController extends AbstractController implements ClassResourceInter
      * 
      * @return array
      */
-    public function findAction(Request $request, ParamFetcher $fetcher)
+    public function findAction(ParamFetcherInterface $fetcher)
     {
         $block       = null;
         $subject     = null;
@@ -120,27 +151,29 @@ class SectionController extends AbstractController implements ClassResourceInter
             throw new ConflictHttpException();
         }*/
 
-        // print_r($request->request->all());die;
+        // print_r($fetcher->all());die;
+        /*print_r($fetcher->all());die;
+        print_r($request->query->all());die;*/
         
-        if ($block_id = $request->request->get('block')) {
+        if ($block_id = $fetcher->get('block')) {
             $block = $this->getRepo(TermBlock::class)
                 ->findById($block_id)
             ;
         }
         
-        if ($instructor_id = $request->request->get('instructor')) {
+        if ($instructor_id = $fetcher->get('instructor')) {
             $instructor = $this->getRepo(Instructor::class)
                 ->findById($instructor_id)
             ;
         }
         
-        if ($subject_id = $request->request->get('subject')) {
+        if ($subject_id = $fetcher->get('subject')) {
             $subject = $this->getRepo(Subject::class)
                 ->findById($subject_id)
             ;
         }
         
-        if ($course_id = $request->request->get('course')) {
+        if ($course_id = $fetcher->get('course')) {
             $course = $this->getRepo(Course::class)
                 ->findById($course_id)
             ;
