@@ -4,9 +4,6 @@ namespace App\Controller;
 
 use DateTime;
 use App\Entity\Section;
-use FOS\RestBundle\Controller\Annotations\View;
-use FOS\RestBundle\Request\ParamFetcher;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -21,14 +18,12 @@ class DownloadController extends AbstractController
      * @Route("/download", methods={"POST"})
      * 
      * @see https://vauly.com/symfony2-export-csv
-     * 
-     * @param Request $request
      *
      * @return StreamedResponse
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        $response = $this->forward('App\Controller\SectionController::findAction', [], $request->query->all());
+        $response = $this->forward('App\Controller\SectionController::findAction');
         $sections = json_decode($response->getContent(), true);
         $response = new StreamedResponse();
 
