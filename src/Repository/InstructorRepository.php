@@ -21,22 +21,27 @@ class InstructorRepository extends EntityRepository
      * 
      * @return array
      */
-    public function getInstructorsBySubject(TermBlock $block)
+    public function getInstructorsBySubject(TermBlock $block, $subject_id)
     {
         /* @var Connection $conn */
         $conn = $this->getEntityManager()->getConnection();
+        $where = '';
+
+        if (!empty($subject_id) && is_numeric($subject_id)) {
+            $where = "AND sub.id = {$subject_id}";
+        }
         
-        $statement = $conn->prepare('
+        $statement = $conn->prepare("
             SELECT sub.name AS subject_name, i.id, i.name, COUNT(s.id) AS num_sections
             FROM section AS s
             JOIN subject AS sub
               ON s.subject_id = sub.id
             JOIN instructor AS i
               ON s.instructor_id = i.id
-            WHERE s.block_id = :block
+            WHERE s.block_id = :block {$where}
             GROUP BY sub.id, i.id, i.name
             ORDER BY i.name
-        ');
+        ");
         
         $statement->execute(['block' => $block->getId()]);
         $results = [];

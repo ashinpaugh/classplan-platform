@@ -3,9 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Instructor;
-use App\Entity\TermBlock;
+use App\Entity\Section;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
@@ -61,26 +60,5 @@ class InstructorController extends AbstractController implements ClassResourceIn
         }
         
         return ['instructor' => $instructor];
-    }
-    
-    /**
-     * Fetches all the known instructors and groups them by subject name.
-     *
-     * @Rest\Route("/instructor/{block}/subjects", requirements={
-     *     "block": "\d+"
-     * })
-     *
-     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"instructor", "block_full"})
-     */
-    public function getSubjectAction(TermBlock $block)
-    {
-        $instructors = $this->getRepo(Instructor::class)
-            ->getInstructorsBySubject($block)
-        ;
-        
-        return [
-            'block'       => $block,
-            'instructors' => $instructors
-        ];
     }
 }

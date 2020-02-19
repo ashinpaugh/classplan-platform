@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Instructor;
 use App\Entity\Section;
 use App\Entity\Subject;
 use App\Entity\Term;
@@ -62,38 +63,78 @@ class TermController extends AbstractController implements ClassResourceInterfac
      */
     public function getSubjectsAction(TermBlock $block)
     {
-        /*$sections = $this->getRepo(Section::class)
-            ->findBy([
-                'block' => $block,
-            ])
-        ;
-
-        $subjects = [];
-        */
-
         $subjects = $this->getRepo(Subject::class)
             ->getByBlock($block)
         ;
 
-        /* @var Section $section */
-        /*foreach ($sections as $section) {
-            if (!$section instanceof Section) {
-                continue;
-            }
-
-            $subject    = $section->getSubject();
-            $subject_id = $subject->getId();
-
-            if (array_key_exists($subject_id, $subjects)) {
-                continue;
-            }
-
-            $subjects[$subject_id] = $subject;
-        }*/
-
         return [
             'block'    => $block,
             'subjects' => $subjects,
+        ];
+    }
+
+    /**
+     * Fetches all the known instructors and groups them by subject name.
+     *
+     * @Rest\Route("/term/{block}/subject/{subject}/instructors", defaults={"subject"=0}, requirements={
+     *     "block": "\d+",
+     *     "subject": "\d+"
+     * })
+     *
+     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"block_full", "instructor"})
+     */
+    public function getSubjectInstructorsAction(TermBlock $block, int $subject)
+    {
+        $instructors = $this->getRepo(Instructor::class)
+            ->getInstructorsBySubject($block, $subject)
+        ;
+
+        return [
+            'block'       => $block,
+            'instructors' => $instructors,
+        ];
+    }
+
+    /**
+     * @Rest\Route("/term/{block}/instructor/{instructor}/subjects", requirements={
+     *   "block": "\d+",
+     *   "instructor": "\d+"
+     * })
+     *
+     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"block_full", "instructor", "subject"})
+     *
+     * @param TermBlock  $block
+     * @param Instructor $instructor
+     *
+     * @return array
+     */
+    public function getInstructorSubjectsAction(TermBlock $block, Instructor $instructor)
+    {
+        $sections = $this->getRepo(Section::class)
+            ->findBy([
+                'block'      => $block,
+                'instructor' => $instructor,
+            ])
+        ;
+
+        $subjects = [];
+
+        /* @var Section $section */
+        foreach ($sections as $section) {
+            $subject = $section->getSubject();
+
+            if (array_key_exists($subject->getId(), $subjects)) {
+                continue;
+            }
+
+            $subjects[$subject->getId()] = $subject;
+        }
+
+
+        return [
+            'block'      => $block,
+            'instructor' => $instructor,
+            'subjects'   => array_values($subjects),
         ];
     }
 }

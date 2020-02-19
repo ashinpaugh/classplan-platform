@@ -2,11 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Instructor;
-use App\Entity\Section;
 use App\Entity\Subject;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 
 /**
@@ -60,49 +57,14 @@ class SubjectController extends AbstractController implements ClassResourceInter
      *     description="The short-name of the subject/department to look up."
      * )
      */
-    public function getByNameAction(ParamFetcher $fetcher)
+    public function getByNameAction(string $name)
     {
         $subject = $this->getRepo(Subject::class)
             ->findOneBy([
-                'name' => $fetcher->get('name'),
+                'name' => $name,
             ])
         ;
 
         return ['subject' => $subject];
-    }
-
-    /**
-     * @Rest\Route("/subject/{id}/instructor", requirements={
-     *     "id": "\d+"
-     * })
-     *
-     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"subject"})
-     *
-     * @param Instructor $instructor
-     * @return array
-     */
-    public function getByInstructorAction(Instructor $instructor)
-    {
-        $sections = $this->getRepo(Section::class)
-            ->findBy([
-                'instructor' => $instructor,
-            ])
-        ;
-
-        $subjects = [];
-
-        /* @var Section $section */
-        foreach ($sections as $section) {
-            $subject = $section->getSubject();
-
-            if (array_key_exists($subject->getId(), $subjects)) {
-                continue;
-            }
-
-            $subjects[$subject->getId()] = $subject;
-        }
-
-
-        return ['subjects' => $subjects];
     }
 }
