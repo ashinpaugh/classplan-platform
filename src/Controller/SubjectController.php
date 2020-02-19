@@ -34,16 +34,18 @@ class SubjectController extends AbstractController implements ClassResourceInter
      * Get the courses related to a subject.
      *
      * @Rest\Route("/subject/{id}", requirements={
-     *     "id": "\d+"
+     *     "id": "\d+|\w+"
      * })
      *
      * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"subject_full"})
      *
      * @param Subject $subject
      */
-    public function getAction(Subject $subject)
+    public function getAction($id)
     {
-        return ['subject' => $subject];
+        $repo = $this->getRepo(Subject::class);
+
+        return ['subject' => $repo->getOneByIndex($id)];
     }
 
     /**

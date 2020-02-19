@@ -71,18 +71,18 @@ class UpdateBuildingsCommand extends AbstractCommand
 
         foreach ($buildings as $building) {
             $building_meta = array_filter($metadata, function (array $item) use ($building, $output) {
-                return $building->getAbbreviation() === $item['abbr'];
+                return $building->getShortname() === $item['abbr'];
             });
 
             if (empty($building_meta)) {
-                $output->writeln('OU directory missing: ' . $building->getAbbreviation());
+                $output->writeln('OU directory missing: ' . $building->getShortname());
                 continue;
             }
 
             $meta = current($building_meta);
             $building
                 ->setCode($meta['code'])
-                ->setShortName($meta['name'])
+                ->setFullName($meta['name'])
             ;
 
             $this->doctrine->persist($building);

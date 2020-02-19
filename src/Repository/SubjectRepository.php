@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Subject;
 use App\Entity\TermBlock;
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\ORM\EntityRepository;
@@ -13,6 +14,20 @@ use Doctrine\ORM\EntityRepository;
  */
 class SubjectRepository extends EntityRepository
 {
+    public function getOneByIndex($id): ?Subject
+    {
+        if (in_array($id, ['all', 'any', 'every'])) {
+            return null;
+        }
+
+        $params = is_numeric($id) && $id > 0
+            ? ['id' => $id]
+            : ['name' => $id]
+        ;
+
+        return $this->findOneBy($params);
+    }
+
     public function getByBlock(TermBlock $block)
     {
         /* @var Connection $conn */

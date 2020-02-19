@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Subject;
 use App\Entity\TermBlock;
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\ORM\EntityRepository;
@@ -21,16 +22,18 @@ class InstructorRepository extends EntityRepository
      * 
      * @return array
      */
-    public function getInstructorsBySubject(TermBlock $block, $subject_id)
+    public function getInstructorsBySubject(TermBlock $block, ?Subject $subject)
     {
-        /* @var Connection $conn */
-        $conn = $this->getEntityManager()->getConnection();
-        $where = '';
+        $where  = '';
+        $params = ['block' => $block->getId()];
 
-        if (!empty($subject_id) && is_numeric($subject_id)) {
-            $where = "AND sub.id = {$subject_id}";
+        if (!empty($subject)) {
+            $where .= "AND sub.id = :subject";
+            $params['subject'] = $subject->getId();
         }
-        
+
+        /* @var Connection $conn */
+        $conn      = $this->getEntityManager()->getConnection();
         $statement = $conn->prepare("
             SELECT sub.name AS subject_name, i.id, i.name, COUNT(s.id) AS num_sections
             FROM section AS s
@@ -43,7 +46,7 @@ class InstructorRepository extends EntityRepository
             ORDER BY i.name
         ");
         
-        $statement->execute(['block' => $block->getId()]);
+        $statement->execute($params);
         $results = [];
         
         foreach ($statement->fetchAll(\PDO::FETCH_ASSOC) as $item) {

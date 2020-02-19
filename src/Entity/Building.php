@@ -12,7 +12,7 @@ use JMS\Serializer\Annotation as Serializer;
  *
  * @ORM\Entity()
  * @ORM\Table(name="building", indexes={
- *    @ORM\Index(name="idx_name", columns={"abbreviation"})
+ *    @ORM\Index(name="idx_name", columns={"short_name"})
  * })
  */
 class Building extends AbstractEntity
@@ -52,7 +52,17 @@ class Building extends AbstractEntity
      *
      * @var string
      */
-    protected $abbreviation;
+    protected $short_name;
+
+    /**
+     * The building's full name.
+     *
+     * @ORM\Column(type="string", nullable=true, length=120)
+     * @Serializer\Exclude()
+     *
+     * @var string
+     */
+    protected $full_name;
 
     /**
      * The five digit ou building code.
@@ -66,16 +76,6 @@ class Building extends AbstractEntity
     protected $code;
 
     /**
-     * The building's full name.
-     *
-     * @ORM\Column(type="string", nullable=true, length=120)
-     * @Serializer\Exclude()
-     *
-     * @var string
-     */
-    protected $short_name;
-    
-    /**
      * Building constructor.
      *
      * @param Campus $campus
@@ -85,9 +85,9 @@ class Building extends AbstractEntity
     {
         $this
             ->setCampus($campus)
-            ->setAbbreviation($abbreviation)
+            ->setShortname($abbreviation)
             ->setCode($code)
-            ->setShortName($name)
+            ->setFullName($name)
         ;
         
         $this->rooms = new ArrayCollection();
@@ -118,7 +118,7 @@ class Building extends AbstractEntity
      */
     public function getName(): string
     {
-        return $this->short_name ?: $this->abbreviation;
+        return $this->full_name ?: $this->short_name;
     }
     
     /**
@@ -196,19 +196,19 @@ class Building extends AbstractEntity
     /**
      * @return string
      */
-    public function getShortName()
+    public function getFullName()
     {
-        return $this->short_name;
+        return $this->full_name;
     }
     
     /**
-     * @param string $short_name
+     * @param string $full_name
      *
      * @return Building
      */
-    public function setShortName(?string $short_name)
+    public function setFullName(?string $full_name)
     {
-        $this->short_name = Encoding::toUTF8($short_name);
+        $this->full_name = Encoding::toUTF8($full_name);
         
         return $this;
     }
@@ -216,17 +216,17 @@ class Building extends AbstractEntity
     /**
      * @return string
      */
-    public function getAbbreviation(): string
+    public function getShortname(): string
     {
-        return $this->abbreviation;
+        return $this->short_name;
     }
 
     /**
-     * @param string $abbreviation
+     * @param string $short_name
      */
-    public function setAbbreviation(string $abbreviation)
+    public function setShortname(string $short_name)
     {
-        $this->abbreviation = Encoding::toUTF8($abbreviation);
+        $this->short_name = Encoding::toUTF8($short_name);
 
         return $this;
     }

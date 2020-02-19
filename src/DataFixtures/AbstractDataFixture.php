@@ -16,7 +16,6 @@ use App\Util\ImportDriverHelper;
 use App\Util\AbstractImportDriver;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -119,7 +118,8 @@ abstract class AbstractDataFixture extends Fixture implements FixtureInterface, 
      */
     protected function getImporter($reset = false)
     {
-        $importer = $this->container->get($this->service_id);
+        $helper   = $this->container->get(ImportDriverHelper::class);
+        $importer = $this->container->get($helper->getServiceId());
         
         if ($reset) {
             $importer->firstEntry();
@@ -305,7 +305,7 @@ abstract class AbstractDataFixture extends Fixture implements FixtureInterface, 
         }
         
         if ($object instanceof Building) {
-            return $this->getKey($object->getCampus()) . '_b-' . $object->getShortName();
+            return $this->getKey($object->getCampus()) . '_b-' . $object->getFullName();
         }
         
         if ($object instanceof Room) {
@@ -383,6 +383,8 @@ abstract class AbstractDataFixture extends Fixture implements FixtureInterface, 
     
     /**
      * Clear the edge side includes so that they no longer server bad data.
+     *
+     * TODO: Is this still necessary?
      * 
      * @return $this
      */

@@ -20,7 +20,7 @@ class OnStartFixture extends AbstractDataFixture
     public function load(ObjectManager $manager)
     {
         $helper = $this->container->get(ImportDriverHelper::class);
-        $import = $this->container->get($this->service_id);
+        $import = $this->getImporter();
         $source = 'book';
         
         if ($import instanceof OdsImportDriver) {
