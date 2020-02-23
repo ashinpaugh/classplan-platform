@@ -65,6 +65,7 @@ class Campus extends AbstractEntity
     /**
      * @Serializer\VirtualProperty(name="buildings")
      * @Serializer\Groups(groups={"campus_full"})
+     * @Serializer\Type("array<integer>")
      *
      * @return int[]
      */
@@ -80,6 +81,7 @@ class Campus extends AbstractEntity
     /**
      * @Serializer\VirtualProperty()
      * @Serializer\Groups(groups={"campus", "building_full"})
+     * @Serializer\Type("string")
      */
     public function getName()
     {

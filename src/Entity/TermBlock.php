@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Util\Debug;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
@@ -12,6 +11,8 @@ use JMS\Serializer\Annotation as Serializer;
 class TermBlock extends AbstractEntity
 {
     /**
+     * The term this block belongs to.
+     *
      * @ORM\ManyToOne(targetEntity="Term", inversedBy="blocks", fetch="EXTRA_LAZY", cascade={"persist"})
      * @Serializer\Groups(groups={"block_full", "section_full"})
      * @Serializer\MaxDepth(1)
@@ -21,6 +22,8 @@ class TermBlock extends AbstractEntity
     protected $term;
     
     /**
+     * The unique block id.
+     *
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
@@ -36,7 +39,7 @@ class TermBlock extends AbstractEntity
      * @ORM\Column(type="string")
      * @Serializer\Exclude()
      *
-     * @var String
+     * @var string
      */
     protected $short_name;
     
@@ -55,8 +58,11 @@ class TermBlock extends AbstractEntity
     }
 
     /**
+     * The owning term's id.
+     *
      * @Serializer\VirtualProperty()
      * @Serializer\Groups(groups={"block"})
+     * @Serializer\Type("integer")
      */
     public function getTermId(): int
     {
@@ -64,10 +70,13 @@ class TermBlock extends AbstractEntity
     }
 
     /**
+     * Maps the block's short-name to a human readable format.
+     *
      * @Serializer\VirtualProperty()
      * @Serializer\Groups(groups={"block", "block_full", "term", "term_full", "section_full"})
+     * @Serializer\Type("string")
      */
-    public function getName()
+    public function getName(): string
     {
         switch ($this->getShortName()) {
             case 1:

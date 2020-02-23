@@ -64,6 +64,7 @@ class Instructor extends AbstractEntity
     /**
      * @Serializer\VirtualProperty(name="sections")
      * @Serializer\Groups(groups={"instructor_full"})
+     * @Serializer\Type("array<integer>")
      *
      * @return int[]
      */

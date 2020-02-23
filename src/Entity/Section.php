@@ -25,6 +25,8 @@ class Section extends AbstractEntity
     const ACTIVE    = 1;
     
     /**
+     * The owning subject.
+     *
      * @ORM\ManyToOne(targetEntity="Subject", inversedBy="sections", fetch="EAGER")
      * @Serializer\Groups(groups={"subject"})
      *
@@ -33,6 +35,8 @@ class Section extends AbstractEntity
     protected $subject;
     
     /**
+     * The owning course.
+     *
      * @ORM\ManyToOne(targetEntity="Course", inversedBy="sections")
      * @Serializer\Groups(groups={"course"})
      *
@@ -41,6 +45,8 @@ class Section extends AbstractEntity
     protected $course;
     
     /**
+     * The campus that's teaching the course.
+     *
      * @ORM\ManyToOne(targetEntity="Campus", inversedBy="sections", fetch="EAGER")
      * @Serializer\Groups(groups={"campus"})
      *
@@ -49,6 +55,8 @@ class Section extends AbstractEntity
     protected $campus;
     
     /**
+     * The room the section is held in.
+     *
      * @ORM\ManyToOne(targetEntity="Room", inversedBy="sections", fetch="LAZY")
      * @Serializer\Groups(groups={"room"})
      *
@@ -57,6 +65,8 @@ class Section extends AbstractEntity
     protected $room;
     
     /**
+     * The primary instructor.
+     *
      * @ORM\ManyToOne(targetEntity="Instructor", inversedBy="sections", fetch="EAGER")
      * @Serializer\Groups(groups={"instructor"})
      * 
@@ -65,6 +75,8 @@ class Section extends AbstractEntity
     protected $instructor;
     
     /**
+     * The block the section belongs to.
+     *
      * @ORM\ManyToOne(targetEntity="TermBlock")
      * @Serializer\Groups({"section_full"})
      *
@@ -73,6 +85,8 @@ class Section extends AbstractEntity
     protected $block;
     
     /**
+     * The unique section id.
+     *
      * @ORM\Id()
      * @ORM\Column(name="id", type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -93,6 +107,8 @@ class Section extends AbstractEntity
     protected $crn;
     
     /**
+     * The section's state / status.
+     *
      * @ORM\Column(type="smallint")
      * @Serializer\Groups({"section", "section_full"})
      *
@@ -101,6 +117,8 @@ class Section extends AbstractEntity
     protected $status;
     
     /**
+     * The section number.
+     *
      * @ORM\Column(type="string", length=3)
      * @Serializer\Groups({"section", "section_full"})
      *
@@ -109,6 +127,8 @@ class Section extends AbstractEntity
     protected $number;
     
     /**
+     * The string representation of the days the class meets.
+     *
      * @ORM\Column(type="string", nullable=true)
      * @Serializer\Groups({"section", "section_full"})
      *
@@ -125,6 +145,8 @@ class Section extends AbstractEntity
     protected $start_date;
     
     /**
+     * 24hr end time.
+     *
      * @ORM\Column(type="date")
      * @Serializer\Exclude()
      *
@@ -133,6 +155,8 @@ class Section extends AbstractEntity
     protected $end_date;
     
     /**
+     * 24hr start time.
+     *
      * @ORM\Column(type="string")
      * @Serializer\Groups({"section", "section_full"})
      *
@@ -141,6 +165,8 @@ class Section extends AbstractEntity
     protected $start_time;
     
     /**
+     * When the section ends.
+     *
      * @ORM\Column(type="string")
      * @Serializer\Groups({"section", "section_full"})
      *
@@ -149,6 +175,8 @@ class Section extends AbstractEntity
     protected $end_time;
     
     /**
+     * The number of students enrolled.
+     *
      * @ORM\Column(type="integer")
      * @Serializer\Groups({"section", "section_full"})
      *
@@ -157,6 +185,8 @@ class Section extends AbstractEntity
     protected $num_enrolled;
     
     /**
+     * The soft-cap of students allowed to enroll.
+     *
      * @ORM\Column(type="integer")
      * @Serializer\Groups({"section", "section_full"})
      *
@@ -176,8 +206,13 @@ class Section extends AbstractEntity
     protected $meeting_type;
     
     /**
-     * @Serializer\VirtualProperty()
+     * The building the section meets in.
+     *
+     * @Serializer\VirtualProperty(name="building")
      * @Serializer\Groups({"section_full"})
+     * @Serializer\Type(Building::class)
+     *
+     * @return Building
      */
     public function getBuilding()
     {
@@ -185,8 +220,13 @@ class Section extends AbstractEntity
     }
     
     /**
+     * The date the section ends (YYYY-MM-DD).
+     *
      * @Serializer\VirtualProperty()
      * @Serializer\Groups({"section", "section_full"})
+     * @Serializer\Type("string")
+     *
+     * @return string
      */
     public function getEnd()
     {
@@ -195,13 +235,45 @@ class Section extends AbstractEntity
     }
     
     /**
+     * The date the section starts (YYYY-MM-DD).
+     *
      * @Serializer\VirtualProperty()
      * @Serializer\Groups({"section", "section_full"})
+     * @Serializer\Type("string")
+     *
+     * @return string
      */
     public function getStart()
     {
         // return $this->formatTime($this->start_date, $this->start_time);
         return $this->start_date->format('Y-m-d');
+    }
+
+    /**
+     * The human readable meeting code.
+     *
+     * @Serializer\VirtualProperty()
+     * @Serializer\Groups(groups={"section_full"})
+     * @Serializer\Type("string")
+     *
+     * @return String
+     */
+    public function getMeetingTypeStr()
+    {
+        switch ($this->meeting_type) {
+            case static::MT_CLASS:
+                return 'class';
+            case static::MT_WEB:
+                return 'web';
+            case static::MT_EXAM:
+                return 'exam';
+            case static::MT_LAB:
+                return 'lab';
+            case static::MT_CONF:
+                return 'conference';
+            default:
+                return 'unknown';
+        }
     }
 
     /**
@@ -591,30 +663,6 @@ class Section extends AbstractEntity
     public function getMeetingType()
     {
         return $this->meeting_type;
-    }
-    
-    /**
-     * @Serializer\VirtualProperty()
-     * @Serializer\Groups(groups={"section_full"})
-     *
-     * @return String
-     */
-    public function getMeetingTypeStr()
-    {
-        switch ($this->meeting_type) {
-            case static::MT_CLASS:
-                return 'class';
-            case static::MT_WEB:
-                return 'web';
-            case static::MT_EXAM:
-                return 'exam';
-            case static::MT_LAB:
-                return 'lab';
-            case static::MT_CONF:
-                return 'conference';
-            default:
-                return 'unknown';
-        }
     }
     
     /**

@@ -16,6 +16,8 @@ use JMS\Serializer\Annotation as Serializer;
 class Subject extends AbstractEntity
 {
     /**
+     * The sections that belong to this subject.
+     *
      * @ORM\OneToMany(targetEntity="Course", mappedBy="subject", cascade={"persist"}, fetch="EXTRA_LAZY")
      * @Serializer\Exclude()
      *
@@ -24,6 +26,8 @@ class Subject extends AbstractEntity
     protected $courses;
     
     /**
+     * The sections that belong to the courses' owned by this subject.
+     *
      * @ORM\OneToMany(targetEntity="Section", mappedBy="subject", cascade={"persist"}, fetch="EXTRA_LAZY")
      * @Serializer\Exclude()
      *
@@ -32,6 +36,8 @@ class Subject extends AbstractEntity
     protected $sections;
     
     /**
+     * The unique subject id.
+     *
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
@@ -42,6 +48,8 @@ class Subject extends AbstractEntity
     protected $id;
     
     /**
+     * The subject name.
+     *
      * @ORM\Column(type="string", unique=true)
      * @Serializer\Groups(groups={"subject", "subject_full"})
      *
@@ -63,8 +71,11 @@ class Subject extends AbstractEntity
     }
 
     /**
+     * The course ids that belong to this subject.
+     *
      * @Serializer\VirtualProperty(name="courses")
      * @Serializer\Groups(groups={"subject_full"})
+     * @Serializer\Type("array<integer>")
      *
      * @return int[]
      */
@@ -78,8 +89,11 @@ class Subject extends AbstractEntity
 	}
 
     /**
+     * The section ids belonging to this subject.
+     *
      * @Serializer\VirtualProperty(name="sections")
      * @Serializer\Groups(groups={"subject_full"})
+     * @Serializer\Type("array<integer>")
      *
      * @return int[]
      */
@@ -93,7 +107,7 @@ class Subject extends AbstractEntity
     }
     
     /**
-     * @return Course[]|ArrayCollection
+     * @return ArrayCollection<Course>
      */
     public function getCourses()
     {

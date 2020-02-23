@@ -82,6 +82,7 @@ class Course extends AbstractEntity
     /**
      * @Serializer\VirtualProperty(name="subject")
      * @Serializer\Groups(groups={"course", "course_full"})
+     * @Serializer\Type("integer")
      *
      * @return int
      */
@@ -93,6 +94,7 @@ class Course extends AbstractEntity
     /**
      * @Serializer\VirtualProperty(name="sections")
      * @Serializer\Groups(groups={"course_full"})
+     * @Serializer\Type("array<integer>")
      *
      * @return array
      */

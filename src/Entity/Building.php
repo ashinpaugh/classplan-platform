@@ -19,8 +19,8 @@ class Building extends AbstractEntity
 {
     /**
      * @ORM\ManyToOne(targetEntity="Campus", inversedBy="buildings", cascade={"all"})
-     * @Serializer\MaxDepth(1)
      * @Serializer\Groups(groups={"building_full"})
+     * @Serializer\MaxDepth(1)
      * 
      * @var Campus
      */
@@ -96,6 +96,7 @@ class Building extends AbstractEntity
     /**
      * @Serializer\VirtualProperty(name="rooms")
      * @Serializer\Groups(groups={"building_full"})
+     * @Serializer\Type("array<integer>")
      *
      * @return int[]
      */
@@ -113,6 +114,7 @@ class Building extends AbstractEntity
      *
      * @Serializer\VirtualProperty()
      * @Serializer\Groups(groups={"building", "building_full"})
+     * @Serializer\Type("string")
      *
      * @return string
      */

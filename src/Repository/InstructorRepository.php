@@ -22,7 +22,7 @@ class InstructorRepository extends EntityRepository
      * 
      * @return array
      */
-    public function getInstructorsBySubject(TermBlock $block, ?Subject $subject)
+    public function getInstructorsBySubject(TermBlock $block, ?Subject $subject = null)
     {
         $where  = '';
         $params = ['block' => $block->getId()];

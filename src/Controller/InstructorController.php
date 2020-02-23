@@ -3,10 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Instructor;
-use App\Entity\Section;
-use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Operation;
+use Swagger\Annotations as SWG;
 
 /**
  * The instructor controller.
@@ -22,6 +23,18 @@ class InstructorController extends AbstractController implements ClassResourceIn
      *
      * @Rest\Route("/instructors")
      * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"instructor"})
+     *
+     * @Operation(
+     *   tags={"Collections", "Instructor"},
+     *   @SWG\Response(
+     *     response="200",
+     *     description="Success.",
+     *     @SWG\Schema(
+     *       type="object",
+     *       @SWG\Property(property="instructors", type="array", @SWG\Items(ref=@Model(type=Instructor::class, groups={"instructor"})))
+     *     )
+     *   )
+     * )
      */
     public function cgetAction()
     {
@@ -35,30 +48,34 @@ class InstructorController extends AbstractController implements ClassResourceIn
     /**
      * Get all the sections taught by an instructor.
      *
-     * @Rest\Route("/instructor/{id}", requirements={
-     *     "id": "\d+"
-     * })
-     *
+     * @Rest\Route("/instructor/{id}", requirements={"id": "\d+"})
      * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"instructor_full"})
      * 
-     * @QueryParam(
+     * @Operation(
+     *   tags={"Instructor"},
+     *   @SWG\Parameter(
      *     name="id",
-     *     requirements="\d+",
-     *     description="The instructor's campus ID.",
-     *     strict=true,
-     *     allowBlank=false
+     *     in="path",
+     *     description="The instructor id.",
+     *     required=true,
+     *     type="integer",
+     *     @SWG\Schema(type="integer"),
+     *   ),
+     *   @SWG\Response(
+     *     response="200",
+     *     description="Success.",
+     *     @SWG\Schema(
+     *       type="object",
+     *       @SWG\Property(property="instructor", ref=@Model(type=Instructor::class, groups={"instructor_full"}))
+     *     )
+     *   )
      * )
+     *
+     * @param Instructor $instructor
+     * @return array
      */
-    public function getAction(int $id)
+    public function getAction(Instructor $instructor)
     {
-        $instructor = $this->getRepo(Instructor::class)
-            ->find($id)
-        ;
-        
-        if (!$instructor instanceof Instructor) {
-            return null;
-        }
-        
         return ['instructor' => $instructor];
     }
 }

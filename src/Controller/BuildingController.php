@@ -20,16 +20,21 @@ class BuildingController extends AbstractController implements ClassResourceInte
 {
 
     /**
+     * Fetch all of the known buildings.
+     *
      * @Rest\Route("/buildings")
      * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"building"})
      *
-     * @SWG\Response(
-     *    response="200",
-     *    description="Buildings returned successfully.",
-     *    @SWG\Schema(
-     *        type="array",
-     *        @SWG\Items(ref=@Model(type=Building::class))
-     *    )
+     * @Operation(
+     *   tags={"Collections", "Building"},
+     *   @SWG\Response(
+     *     response="200",
+     *     description="Success.",
+     *     @SWG\Schema(
+     *       type="object",
+     *       @SWG\Property(property="buildings", type="array", @SWG\Items(ref=@Model(type=Building::class, groups={"building"})))
+     *     )
+     *   )
      * )
      */
     public function cgetAction()
@@ -44,45 +49,41 @@ class BuildingController extends AbstractController implements ClassResourceInte
     /**
      * Fetch a specific building.
      *
-     * @Operation(
-     *     tags={""},
-     *     summary="Fetch a specific building.",
-     *     @SWG\Response(
-     *         response="200",
-     *         description="Returned when successful"
-     *     )
-     * )
-     *
-     * @Rest\Route("/building/{id}", requirements={
-     *     "id": "\d+"
-     * })
-     *
+     * @Rest\Route("/building/{id}", requirements={"idOrName": "\d+\w+"})
      * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"building_full"})
+     *
+     * @Operation(
+     *   tags={"Building"},
+     *   summary="Fetch a specific building by id or short-name.",
+     *   @SWG\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="The building id or short-name.",
+     *     required=true,
+     *     type="string",
+     *     @SWG\Schema(type="integer"),
+     *   ),
+     *   @SWG\Response(
+     *     response="200",
+     *     description="Success.",
+     *     @SWG\Schema(
+     *       type="object",
+     *       @SWG\Property(property="building", ref=@Model(type=Building::class, groups={"building_full"}))
+     *     )
+     *   )
+     * )
      */
-    public function getAction(int $id)
+    public function getAction($idOrName)
     {
+        $filter = is_numeric($idOrName) && $idOrName > 0
+            ? ['id' => $idOrName]
+            : ['short_name' => $idOrName]
+        ;
+
         $building = $this->getRepo(Building::class)
-            ->find($id)
+            ->find($filter)
         ;
 
         return ['building' => $building];
-    }
-
-    /**
-     * @Rest\Route("/building/{name}", requirements={
-     *     "name": "\w+"
-     * })
-     *
-     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"building_full"})
-     */
-    public function getByNameAction(string $name)
-    {
-        $buildings = $this->getRepo(Building::class)
-            ->findBy([
-                'short_name' => $name,
-            ])
-        ;
-
-        return ['buildings' => $buildings];
     }
 }

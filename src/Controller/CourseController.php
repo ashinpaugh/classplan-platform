@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Course;
-use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\Operation;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -21,16 +20,21 @@ class CourseController extends AbstractController implements ClassResourceInterf
 {
 
     /**
+     * Fetch all the known courses.
+     *
      * @Rest\Route("/courses")
      * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"course"})
      *
-     * @SWG\Response(
-     *    response="200",
-     *    description="Courses returned successfully.",
-     *    @SWG\Schema(
-     *        type="array",
-     *        @SWG\Items(ref=@Model(type=Course::class))
-     *    )
+     * @Operation(
+     *   tags={"Collections", "Course"},
+     *   @SWG\Response(
+     *     response="200",
+     *     description="Success.",
+     *     @SWG\Schema(
+     *       type="object",
+     *       @SWG\Property(property="courses", type="array", @SWG\Items(ref=@Model(type=Course::class, groups={"course"})))
+     *     )
+     *   )
      * )
      */
     public function cgetAction()
@@ -41,85 +45,35 @@ class CourseController extends AbstractController implements ClassResourceInterf
         
         return ['courses' => $courses];
     }
-    
+
     /**
-     * Fetch a specific course.
-     * 
-     * @Operation(
-     *     tags={""},
-     *     summary="Fetch a specific course.",
-     *     @SWG\Response(
-     *         response="200",
-     *         description="Returned when successful"
-     *     )
-     * )
+     * Fetch a course object.
      *
-     * @Rest\Route("/course", requirements={
-     *     "subject": "\d+",
-     *     "course":  "\d+"
-     * })
-     *
-     * @Rest\QueryParam(
-     *     name="subject",
-     *     description="The subject/department id.",
-     *     allowBlank=false,
-     *     requirements="\d+"
-     * )
-     *
-     * @Rest\QueryParam(
-     *     name="course",
-     *     description="The course id.",
-     *     allowBlank=false,
-     *     requirements="\d+"
-     * )
-     *
+     * @Rest\Route("/course/{id}", requirements={"id": "\d+"})
      * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"course_full"})
+     *
+     * @Operation(
+     *   tags={"Course"},
+     *   @SWG\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="The course ID.",
+     *     required=true,
+     *     type="integer",
+     *     @SWG\Schema(type="integer"),
+     *   ),
+     *   @SWG\Response(
+     *     response="200",
+     *     description="Success.",
+     *     @SWG\Schema(
+     *       type="object",
+     *       @SWG\Property(property="course", ref=@Model(type=Course::class, groups={"course_full"}))
+     *     )
+     *   )
+     * )
      */
-    public function getAction(ParamFetcher $params)
+    public function getAction(Course $course)
     {
-        $course = $this->getRepo(Course::class)
-            ->findOneBy([
-                'subject' => [
-                    'id' => $params->get('subject'),
-                ],
-                'id' => $params->get('course'),
-            ])
-        ;
-
         return ['course' => $course];
-    }
-    
-    /**
-     * @Rest\Route(
-     *     path="/course/{subject}/{number}"
-     * )
-     * 
-     * @Rest\QueryParam(
-     *     name="subject",
-     *     description="The subject/department short name.",
-     *     allowBlank=false
-     * )
-     * 
-     * @Rest\QueryParam(
-     *     name="number",
-     *     description="The course number.",
-     *     allowBlank=false,
-     *     requirements="\d+"
-     * )
-     * 
-     * @Rest\View(serializerEnableMaxDepthChecks=true)
-     */
-    public function getByNumberAction(ParamFetcher $fetcher)
-    {
-        $courses = $this->getRepo(Course::class)
-            ->findBy([
-                'subject' => [
-                    'name' => $fetcher->get('subject')
-                ],
-                'number' => $fetcher->get('number'),
-            ])
-        ;
-
-        return ['courses' => $courses];
     }
 }

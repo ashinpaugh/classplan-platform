@@ -15,8 +15,8 @@ use JMS\Serializer\Annotation as Serializer;
 class Term extends AbstractEntity
 {
     /**
-     * @Serializer\MaxDepth(2)
-     * 
+     * The blocks assigned to this term.
+     *
      * @ORM\OneToMany(targetEntity="TermBlock", mappedBy="term", fetch="EAGER", cascade={"detach"})
      * @Serializer\Groups(groups={"term", "term_full"})
      *
@@ -25,6 +25,8 @@ class Term extends AbstractEntity
     protected $blocks;
     
     /**
+     * The unique building id.
+     *
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
@@ -35,6 +37,8 @@ class Term extends AbstractEntity
     protected $id;
     
     /**
+     * The full name of the term (Semester + Year).
+     *
      * @ORM\Column(type="string")
      * @Serializer\Groups(groups={"term", "term_full", "block_full", "section_full"})
      *
@@ -43,6 +47,8 @@ class Term extends AbstractEntity
     protected $name;
     
     /**
+     * The term year.
+     *
      * @ORM\Column(type="integer")
      * @Serializer\Groups(groups={"term", "term_full", "block_full", "section_full"})
      *
@@ -51,6 +57,8 @@ class Term extends AbstractEntity
     protected $year;
     
     /**
+     * The term semester.
+     *
      * @ORM\Column(type="string")
      * @Serializer\Groups(groups={"term", "term_full", "block_full", "section_full"})
      *
@@ -103,7 +111,7 @@ class Term extends AbstractEntity
     }
     
     /**
-     * @return TermBlock[]|ArrayCollection
+     * @return ArrayCollection<TermBlock>
      */
     public function getBlocks()
     {
