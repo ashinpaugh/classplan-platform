@@ -3,7 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\UpdateLog;
-use App\Util\ImportDriverHelper;
+use App\Helpers\ImportDriverHelper;
 use Doctrine\Persistence\ObjectManager;
 
 

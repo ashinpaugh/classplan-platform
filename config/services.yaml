@@ -37,7 +37,7 @@ services:
         calls:
             - [ setProjectDir, [ "@kernel" ] ]
 
-    App\Util\ImportDriverHelper:
+    App\Helpers\ImportDriverHelper:
         public: true
         calls:
             - [ setNumberOfYears, [ "%num_years_to_import%" ] ]

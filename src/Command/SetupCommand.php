@@ -8,7 +8,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
@@ -65,11 +64,13 @@ class SetupCommand extends AbstractCommand
         $output->writeln("\nSetup complete.");
         
         if (!$input->getOption('import')) {
-            $output->writeln("Next run <info>php bin/console classplan:import -n --purge-with-truncate --no-debug</info> command to populate the database.");
-            return;
+            $output->writeln("Next run <info>php bin/console classplan:import --env=dev -n --no-debug</info> command to populate the database.");
+            return 0;
         }
         
         $this->doImport($output);
+
+        return 0;
     }
     
     /**

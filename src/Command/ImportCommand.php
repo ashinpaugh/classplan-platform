@@ -2,12 +2,11 @@
 
 namespace App\Command;
 
-use App\Util\ImportDriverHelper;
+use App\Helpers\ImportDriverHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Extends doctrine's fixtures command for integration into the
@@ -81,10 +80,14 @@ class ImportCommand extends AbstractCommand
             ;
 
             $command->run($args, $output);
+
+            return 0;
         } catch (\ErrorException $e) {
             $output->writeln('An error occurred: ' . $e->getMessage());
+            return $e->getCode();
         } catch (\Exception $e) {
             $output->writeln('An error occurred executing [doctrine:fixtures:load]: ' . $e->getMessage());
+            return $e->getCode();
         }
     }
 }

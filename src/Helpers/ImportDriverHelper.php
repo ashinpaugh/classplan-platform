@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Util;
+namespace App\Helpers;
 
 use App\Entity\UpdateLog;
 use Doctrine\Bundle\DoctrineBundle\Registry;

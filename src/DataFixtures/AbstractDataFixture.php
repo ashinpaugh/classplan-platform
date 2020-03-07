@@ -12,7 +12,7 @@ use App\Entity\Section;
 use App\Entity\Subject;
 use App\Entity\Term;
 use App\Entity\TermBlock;
-use App\Util\ImportDriverHelper;
+use App\Helpers\ImportDriverHelper;
 use App\Util\AbstractImportDriver;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Bundle\FixturesBundle\Fixture;

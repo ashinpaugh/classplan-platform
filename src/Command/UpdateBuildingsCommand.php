@@ -57,8 +57,11 @@ class UpdateBuildingsCommand extends AbstractCommand
     {
         try {
             $this->doUpdate($input, $output);
+
+            return 0;
         } catch (LogicException $e) {
             $output->writeln($e->getMessage());
+            return $e->getCode();
         }
     }
 
