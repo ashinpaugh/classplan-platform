@@ -49,14 +49,14 @@ class BuildingController extends AbstractController implements ClassResourceInte
     /**
      * Fetch a specific building.
      *
-     * @Rest\Route("/building/{id}", requirements={"idOrName": "\d+\w+"})
+     * @Rest\Route("/building/{idOrName}", requirements={"idOrName": "\d+|\w+"})
      * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"building_full"})
      *
      * @Operation(
      *   tags={"Building"},
      *   summary="Fetch a specific building by id or short-name.",
      *   @SWG\Parameter(
-     *     name="id",
+     *     name="idOrName",
      *     in="path",
      *     description="The building id or short-name.",
      *     required=true,
@@ -75,13 +75,13 @@ class BuildingController extends AbstractController implements ClassResourceInte
      */
     public function getAction($idOrName)
     {
-        $filter = is_numeric($idOrName) && $idOrName > 0
+        $params = is_numeric($idOrName) && $idOrName > 0
             ? ['id' => $idOrName]
             : ['short_name' => $idOrName]
         ;
 
         $building = $this->getRepo(Building::class)
-            ->find($filter)
+            ->findOneBy($params)
         ;
 
         return ['building' => $building];

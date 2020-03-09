@@ -77,7 +77,7 @@ class SubjectController extends AbstractController implements ClassResourceInter
     {
         $repo = $this->getRepo(Subject::class);
 
-        return ['subject' => $repo->getOneByIndex($id)];
+        return ['subject' => $repo->findOneByIndex($id)];
     }
 
     /**
@@ -123,7 +123,7 @@ class SubjectController extends AbstractController implements ClassResourceInter
      */
     public function getCourseAction(string $subject, int $number)
     {
-        $subject = $this->getRepo(Subject::class)->getOneByIndex($subject);
+        $subject = $this->getRepo(Subject::class)->findOneByIndex($subject);
         $course  = $this->getRepo(Course::class)
             ->findOneBy([
                 'subject' => $subject,

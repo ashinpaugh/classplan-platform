@@ -14,12 +14,8 @@ use Doctrine\ORM\EntityRepository;
  */
 class SubjectRepository extends EntityRepository
 {
-    public function getOneByIndex($id): ?Subject
+    public function findOneByIndex($id): ?Subject
     {
-        if (in_array($id, ['all', 'any', 'every'])) {
-            return null;
-        }
-
         $params = is_numeric($id) && $id > 0
             ? ['id' => $id]
             : ['name' => $id]

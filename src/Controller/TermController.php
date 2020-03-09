@@ -177,7 +177,7 @@ class TermController extends AbstractController implements ClassResourceInterfac
      */
     public function getSubjectInstructorsAction(TermBlock $block, $subject)
     {
-        $subject     = $this->getRepo(Subject::class)->getOneByIndex($subject);
+        $subject     = $this->getRepo(Subject::class)->findOneByIndex($subject);
         $instructors = $this->getRepo(Instructor::class)
             ->getInstructorsBySubject($block, $subject)
         ;
