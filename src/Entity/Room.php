@@ -8,7 +8,7 @@ use ForceUTF8\Encoding;
 use JMS\Serializer\Annotation as Serializer;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="App\Repository\RoomRepository")
  * @ORM\Table(name="room", indexes={
  *    @ORM\Index(name="idx_number", columns={"number"})
  * })
@@ -25,7 +25,8 @@ class Room extends AbstractEntity
     
     /**
      * @ORM\OneToMany(targetEntity="Section", mappedBy="room")
-     * @Serializer\Groups(groups={"room_full"})
+     * @Serializer\Groups(groups={"room_sections"})
+     * @Serializer\MaxDepth(1)
      *
      * @var Section[]
      */

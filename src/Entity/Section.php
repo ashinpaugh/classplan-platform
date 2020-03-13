@@ -37,7 +37,7 @@ class Section extends AbstractEntity
     /**
      * The owning course.
      *
-     * @ORM\ManyToOne(targetEntity="Course", inversedBy="sections")
+     * @ORM\ManyToOne(targetEntity="Course", inversedBy="sections", fetch="EAGER")
      * @Serializer\Groups(groups={"course"})
      *
      * @var Course
@@ -53,11 +53,21 @@ class Section extends AbstractEntity
      * @var Campus
      */
     protected $campus;
+
+    /**
+     * The room the section is held in.
+     *
+     * @ORM\ManyToOne(targetEntity="Building", fetch="LAZY")
+     * @Serializer\Groups(groups={"building"})
+     *
+     * @var Building
+     */
+    protected $building;
     
     /**
      * The room the section is held in.
      *
-     * @ORM\ManyToOne(targetEntity="Room", inversedBy="sections", fetch="LAZY")
+     * @ORM\ManyToOne(targetEntity="Room", inversedBy="sections", fetch="EAGER")
      * @Serializer\Groups(groups={"room"})
      *
      * @var Room
@@ -216,7 +226,7 @@ class Section extends AbstractEntity
      */
     public function getBuilding()
     {
-        return $this->room->getBuilding();
+        return $this->building;
     }
     
     /**
@@ -594,6 +604,8 @@ class Section extends AbstractEntity
         
         return $this;
     }
+
+
     
     /**
      * @return Room
@@ -612,6 +624,18 @@ class Section extends AbstractEntity
     {
         $this->room = $room;
         
+        return $this->setBuilding($room->getBuilding());
+    }
+
+    /**
+     * @param Building $building
+     *
+     * @return $this
+     */
+    public function setBuilding(Building $building)
+    {
+        $this->building = $building;
+
         return $this;
     }
     
@@ -672,12 +696,14 @@ class Section extends AbstractEntity
      */
     public function setMeetingType($meeting_type)
     {
-        if (in_array($meeting_type, [static::MT_EXAM, static::MT_WEB, static::MT_CLASS, static::MT_CONF, static::MT_LAB], true)) {
+        $meeting_codes = [static::MT_EXAM, static::MT_WEB, static::MT_CLASS, static::MT_CONF, static::MT_LAB];
+
+        if (in_array((int) $meeting_type, $meeting_codes, true)) {
             $this->meeting_type = $meeting_type;
-            
+
             return $this;
         }
-        
+
         switch ($meeting_type) {
             case 'CLAS':
             case 'class':

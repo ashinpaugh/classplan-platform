@@ -3,6 +3,8 @@
 namespace App\Helpers;
 
 use App\Entity\UpdateLog;
+use App\Util\BookImportDriver;
+use App\Util\OdsImportDriver;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -83,7 +85,10 @@ class ImportDriverHelper
             throw new \ErrorException("Invalid input provided for source option. Must be either 'book' or 'ods'.");
         }
         
-        $this->service_id = 'book' === $id ? BookImportDriver::class : OdsImportDriver::class;
+        $this->service_id = 'book' === $id
+            ? BookImportDriver::class
+            : OdsImportDriver::class
+        ;
         
         return $this;
     }

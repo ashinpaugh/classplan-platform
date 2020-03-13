@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Building;
 use App\Entity\Course;
 use App\Entity\Instructor;
+use App\Entity\Room;
 use App\Entity\Section;
 use App\Entity\Subject;
 use App\Entity\TermBlock;
@@ -83,14 +85,14 @@ class SectionController extends AbstractController implements ClassResourceInter
      *   @SWG\Parameter(
      *     name="instructor",
      *     in="body",
-     *     description="Optional. The instructor id(s) to filter on.",
+     *     description="Optional. The instructor id(s).",
      *     required=false,
      *     @SWG\Schema(type="array", @SWG\Items(type="integer"))
      *   ),
      *   @SWG\Parameter(
      *     name="course",
      *     in="body",
-     *     description="Optional. The course number id(s) to filter on.",
+     *     description="Optional. The course number id(s).",
      *     required=false,
      *     @SWG\Schema(type="array", @SWG\Items(type="integer"))
      *   ),
@@ -123,14 +125,28 @@ class SectionController extends AbstractController implements ClassResourceInter
      *   map=true,
      *   nullable=true,
      *   requirements="\d+",
-     *   description="Optional. The instructor id(s) to filter on."
+     *   description="Optional. The instructor id(s)."
      * )
      * @Rest\RequestParam(
      *   name="course",
      *   map=true,
      *   nullable=true,
      *   requirements="\d+",
-     *   description="Optional. The course number id(s) to filter on."
+     *   description="Optional. The course id(s)."
+     * )
+     * @Rest\RequestParam(
+     *   name="building",
+     *   map=true,
+     *   nullable=true,
+     *   requirements="\d+",
+     *   description="Optional. The building id(s)."
+     * )
+     * @Rest\RequestParam(
+     *   name="room",
+     *   map=true,
+     *   nullable=true,
+     *   requirements="\d+",
+     *   description="Optional. The room id(s)."
      * )
      *
      * @param ParamFetcherInterface $fetcher
@@ -142,7 +158,9 @@ class SectionController extends AbstractController implements ClassResourceInter
         $subject     = null;
         $course      = null;
         $instructor  = null;
-        
+        $building    = null;
+        $room        = null;
+
         /*if (!$this->checkTimestamp($fetcher->get('u'))) {
             throw new ConflictHttpException();
         }*/
@@ -152,35 +170,46 @@ class SectionController extends AbstractController implements ClassResourceInter
                 ->findById($block_id)
             ;
         }
-        
-        if ($instructor_id = $fetcher->get('instructor')) {
-            $instructor = $this->getRepo(Instructor::class)
-                ->findById($instructor_id)
-            ;
-        }
-        
+
         if ($subject_id = $fetcher->get('subject')) {
             $subject = $this->getRepo(Subject::class)
                 ->findById($subject_id)
             ;
         }
-        
+
         if ($course_id = $fetcher->get('course')) {
             $course = $this->getRepo(Course::class)
                 ->findById($course_id)
             ;
         }
-        
-        // $this->get('session')->set('last_query', $request->getQueryString());
+
+        if ($instructor_id = $fetcher->get('instructor')) {
+            $instructor = $this->getRepo(Instructor::class)
+                ->findById($instructor_id)
+            ;
+        }
+
+        if ($building_id = $fetcher->get('building')) {
+            $building = $this->getRepo(Building::class)
+                ->findById($building_id)
+            ;
+        }
+
+        if ($room_id = $fetcher->get('room')) {
+            $room = $this->getRepo(Room::class)
+                ->findById($room_id)
+            ;
+        }
 
         $sections = $this->getRepo(Section::class)
             ->findBy(array_filter([
-                    'block'      => $block,
-                    'subject'    => $subject,
-                    'course'     => $course,
-                    'instructor' => $instructor,
-                ])
-            )
+                'block'      => $block,
+                'subject'    => $subject,
+                'course'     => $course,
+                'instructor' => $instructor,
+                'building'   => $building,
+                'room'       => $room,
+            ]))
         ;
         
         return ['sections' => $sections];

@@ -305,7 +305,7 @@ abstract class AbstractDataFixture extends Fixture implements FixtureInterface, 
         }
         
         if ($object instanceof Building) {
-            return $this->getKey($object->getCampus()) . '_b-' . $object->getFullName();
+            return $this->getKey($object->getCampus()) . '_b-' . $object->getShortname();
         }
         
         if ($object instanceof Room) {

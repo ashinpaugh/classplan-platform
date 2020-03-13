@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Building;
 use App\Entity\Instructor;
 use App\Entity\Section;
 use App\Entity\Subject;
@@ -309,6 +310,47 @@ class TermController extends AbstractController implements ClassResourceInterfac
             'block'      => $block,
             'instructor' => $instructor,
             'subjects'   => array_values($subjects),
+        ];
+    }
+
+    /**
+     * Fetches all the known instructors and groups them by subject name for a given block.
+     *
+     * @Rest\Route("/term/{block}/buildings",requirements={"block": "\d+"})
+     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"block_full", "building_full", "room"})
+     *
+     * @Operation(
+     *   tags={"Building"},
+     *   summary="Fetch the buildings that were taught in for a semester.",
+     *   @SWG\Parameter(
+     *     name="block",
+     *     in="path",
+     *     description="The term id.",
+     *     required=true,
+     *     type="integer",
+     *     @SWG\Schema(type="integer"),
+     *   ),
+     *   @SWG\Response(
+     *     response="200",
+     *     description="Success.",
+     *     @SWG\Schema(
+     *       type="object",
+     *       @SWG\Property(property="block", ref=@Model(type=TermBlock::class, groups={"block_full"})),
+     *       @SWG\Property(property="buildings", type="array", @SWG\Items(ref=@Model(type=Building::class, groups={"building_full", "room"})))
+     *       )
+     *     )
+     *   )
+     * )
+     */
+    public function getBuildingsAction(TermBlock $block)
+    {
+        $buildings = $this->getRepo(Building::class)
+            ->findByBlock($block)
+        ;
+
+        return [
+            'block'     => $block,
+            'buildings' => $buildings,
         ];
     }
 }

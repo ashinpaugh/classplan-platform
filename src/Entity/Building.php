@@ -10,7 +10,7 @@ use JMS\Serializer\Annotation as Serializer;
 /**
  * @see https://directory.ouhsc.edu/Contacts/BuildingLocations.aspx
  *
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="App\Repository\BuildingRepository")
  * @ORM\Table(name="building", indexes={
  *    @ORM\Index(name="idx_name", columns={"short_name"})
  * })
@@ -18,7 +18,7 @@ use JMS\Serializer\Annotation as Serializer;
 class Building extends AbstractEntity
 {
     /**
-     * @ORM\ManyToOne(targetEntity="Campus", inversedBy="buildings", cascade={"all"})
+     * @ORM\ManyToOne(targetEntity="Campus", inversedBy="buildings", cascade={"all"}, fetch="EAGER")
      * @Serializer\Groups(groups={"building_full"})
      * @Serializer\MaxDepth(1)
      * 
@@ -27,7 +27,7 @@ class Building extends AbstractEntity
     protected $campus;
     
     /**
-     * @ORM\OneToMany(targetEntity="Room", mappedBy="building", cascade={"all"})
+     * @ORM\OneToMany(targetEntity="Room", mappedBy="building", cascade={"all"}, fetch="EAGER")
      * @Serializer\Exclude()
      *
      * @var Room[]
@@ -48,7 +48,7 @@ class Building extends AbstractEntity
      * The building abbreviation (found in TheBook and ODS).
      *
      * @ORM\Column(type="string")
-     * @Serializer\Groups(groups={"building_full"})
+     * @Serializer\Groups(groups={"building", "building_full"})
      *
      * @var string
      */
@@ -68,7 +68,7 @@ class Building extends AbstractEntity
      * The five digit ou building code.
      *
      * @ORM\Column(type="string", nullable=true, length=5)
-     * @Serializer\Groups(groups={"building_full"})
+     * @Serializer\Groups(groups={"building", "building_full"})
      * @Serializer\SkipWhenEmpty()
      *
      * @var string
@@ -91,22 +91,6 @@ class Building extends AbstractEntity
         ;
         
         $this->rooms = new ArrayCollection();
-    }
-
-    /**
-     * @Serializer\VirtualProperty(name="rooms")
-     * @Serializer\Groups(groups={"building_full"})
-     * @Serializer\Type("array<integer>")
-     *
-     * @return int[]
-     */
-    public function getRoomIds(): array
-    {
-        $collection = $this->rooms->map(function (Room $room) {
-            return $room->getId();
-        });
-
-        return $collection->toArray();
     }
 
     /**
@@ -144,6 +128,11 @@ class Building extends AbstractEntity
     }
     
     /**
+     * @Serializer\VirtualProperty(name="rooms")
+     * @Serializer\Groups(groups={"building_full"})
+     * @Serializer\Type("ArrayCollection<App\Entity\Room>")
+     * @Serializer\MaxDepth(1)
+     *
      * @return Room[]
      */
     public function getRooms()

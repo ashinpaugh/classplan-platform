@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Building;
+use App\Entity\Room;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\Operation;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -50,7 +51,7 @@ class BuildingController extends AbstractController implements ClassResourceInte
      * Fetch a specific building.
      *
      * @Rest\Route("/building/{idOrName}", requirements={"idOrName": "\d+|\w+"})
-     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"building_full"})
+     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"building_full", "room"})
      *
      * @Operation(
      *   tags={"Building"},
@@ -68,7 +69,7 @@ class BuildingController extends AbstractController implements ClassResourceInte
      *     description="Success.",
      *     @SWG\Schema(
      *       type="object",
-     *       @SWG\Property(property="building", ref=@Model(type=Building::class, groups={"building_full"}))
+     *       @SWG\Property(property="building", ref=@Model(type=Building::class, groups={"building_full", "room"}))
      *     )
      *   )
      * )
@@ -85,5 +86,47 @@ class BuildingController extends AbstractController implements ClassResourceInte
         ;
 
         return ['building' => $building];
+    }
+
+    /**
+     * Fetch all of the known buildings.
+     *
+     * @Rest\Route("/building/{id}/rooms")
+     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"building", "room"})
+     *
+     * @Operation(
+     *   tags={"Collections", "Building", "Room"},
+     *   @SWG\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="The building id.",
+     *     required=true,
+     *     type="string",
+     *     @SWG\Schema(type="integer"),
+     *   ),
+     *   @SWG\Response(
+     *     response="200",
+     *     description="Success.",
+     *     @SWG\Schema(
+     *       type="object",
+     *       @SWG\Property(property="building", ref=@Model(type=Building::class, groups={"building"})),
+     *       @SWG\Property(property="room", type="array", @SWG\Items(ref=@Model(type=Room::class, groups={"room"})))
+     *     )
+     *   )
+     * )
+     */
+    public function getRoomAction(Building $building)
+    {
+        $rooms = $this->getRepo(Room::class)
+            ->findBy(
+                ['building' => $building],
+                ['number' => 'ASC']
+            )
+        ;
+
+        return [
+            'building' => $building,
+            'rooms'    => $rooms,
+        ];
     }
 }
