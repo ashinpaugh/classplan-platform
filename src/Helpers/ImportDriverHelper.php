@@ -226,7 +226,7 @@ class ImportDriverHelper
         $logs    = $repo->findBy([], ['start' => 'DESC'], 31);
 
         // For re-storing purposes, store from oldest to newest.
-        $this->logs[] = array_reverse($logs);
+        $this->logs = array_reverse($logs);
         $manager->clear(UpdateLog::class);
         
         return $this;
