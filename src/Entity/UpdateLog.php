@@ -9,7 +9,6 @@ use JMS\Serializer\Annotation as Serializer;
  * Tracks the status of imports.
  * 
  * @ORM\Entity()
- * @ORM\HasLifecycleCallbacks()
  */
 class UpdateLog extends AbstractEntity
 {
@@ -20,6 +19,7 @@ class UpdateLog extends AbstractEntity
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
+     * @Serializer\Groups(groups={"update"})
      * 
      * @var integer
      */
@@ -27,34 +27,42 @@ class UpdateLog extends AbstractEntity
     
     /**
      * @ORM\Column(type="datetime")
+     * @Serializer\Groups(groups={"update"})
+     *
      * @var \DateTime
      */
     protected $start;
     
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Serializer\Groups(groups={"update"})
+     *
      * @var \DateTime
      */
     protected $end;
     
     /**
      * @ORM\Column(type="smallint")
+     * @Serializer\Groups(groups={"update"})
+     *
      * @var integer
      */
     protected $status;
     
     /**
      * @ORM\Column(type="string", length=4)
+     * @Serializer\Groups(groups={"update"})
+     *
      * @var string
      */
     protected $source;
     
     /**
      * Tracks the Peak Memory usage in bytes.
-     * 
-     * @Serializer\Exclude()
-     * 
+     *
      * @ORM\Column(type="string", nullable=true)
+     * @Serializer\Exclude()
+     *
      * @var string
      */
     protected $peak_memory;
@@ -70,13 +78,16 @@ class UpdateLog extends AbstractEntity
         $this->status = static::STARTED;
         $this->source = $source;
     }
-    
+
     /**
-     * @ORM\PrePersist()
+     * @Serializer\VirtualProperty()
+     * @Serializer\Groups(groups={"update"})
+     *
+     * @return string
      */
-    public function prePersist()
+    public function getStatusStr(): string
     {
-        $this->id = null;
+        return $this->getStatus() === static::STARTED ? 'updating' : 'complete';
     }
     
     /**
