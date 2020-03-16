@@ -698,15 +698,16 @@ class Section extends AbstractEntity
     {
         $meeting_codes = [static::MT_EXAM, static::MT_WEB, static::MT_CLASS, static::MT_CONF, static::MT_LAB];
 
-        if (in_array((int) $meeting_type, $meeting_codes, true)) {
+        if (is_numeric($meeting_type) && in_array((int) $meeting_type, $meeting_codes, true)) {
             $this->meeting_type = $meeting_type;
 
             return $this;
         }
 
-        switch ($meeting_type) {
+        switch (trim($meeting_type)) {
             case 'CLAS':
             case 'class':
+            case 'TRAD':
                 $this->meeting_type = static::MT_CLASS;
                 
                 return $this;

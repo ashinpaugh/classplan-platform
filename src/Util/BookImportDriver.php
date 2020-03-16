@@ -25,10 +25,11 @@ class BookImportDriver extends AbstractImportDriver
     public function init($mixed = null)
     {
         $default = $this->projectDir . '/' . static::CSV_PATH;
+        $path    = $this->helper->getPath() ?: $default;
 
         $this
             ->setEnvironmentVars()
-            ->setPath($mixed ?: $default)
+            ->setPath($path)
             ->loadRawData()
         ;
     }
@@ -150,7 +151,7 @@ class BookImportDriver extends AbstractImportDriver
             ->setNumber($entry[3])
             ->setNumEnrolled($entry[12])
             ->setMaximumEnrollment($entry[11])
-            ->setMeetingType('class')
+            ->setMeetingType($entry[33])
         ;
         
         return $section;

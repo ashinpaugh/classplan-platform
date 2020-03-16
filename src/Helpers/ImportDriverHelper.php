@@ -40,12 +40,18 @@ class ImportDriverHelper
      * @var Integer
      */
     protected $num_years;
+
+    /**
+     * The path to the datastore if the source is a Book export.
+     *
+     * @var string
+     */
+    protected $path;
     
     /**
      * ImportDriverHelper constructor.
      *
      * @param ManagerRegistry $doctrine
-     * @param Integer  $num_years
      */
     public function __construct(
         ManagerRegistry $doctrine
@@ -56,9 +62,24 @@ class ImportDriverHelper
         $this->fetchUpdateLogs();
     }
 
+    /**
+     * For ODS imports set the default number of historical years to import.
+     *
+     * @param int $years
+     */
     public function setNumberOfYears(int $years)
     {
         $this->num_years = $years;
+    }
+
+    /**
+     * Returns the filepath used for TheBook imports.
+     *
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
     }
     
     /**
@@ -74,21 +95,30 @@ class ImportDriverHelper
     /**
      * Sets the service id.
      * 
-     * @param string $id
+     * @param string $source
      *
      * @return $this
      * @throws \ErrorException
      */
-    public function setServiceId($id)
+    public function setServiceId($source)
     {
-        if (!static::isValidImportId($id)) {
-            throw new \ErrorException("Invalid input provided for source option. Must be either 'book' or 'ods'.");
+        if (!static::isValidImportSource($source)) {
+            throw new \ErrorException("Invalid input provided for source option. Must be either 'book', 'ods', or a full filepath to a Book export.");
         }
+
+        if ('ods' === $source) {
+            $this->service_id = OdsImportDriver::class;
+            return $this;
+        }
+
+        $this->service_id = BookImportDriver::class;
+        $this->path       = null;
         
-        $this->service_id = 'book' === $id
-            ? BookImportDriver::class
-            : OdsImportDriver::class
-        ;
+        if ('book' === $source) {
+            return $this;
+        }
+
+        $this->path = $source;
         
         return $this;
     }
@@ -113,15 +143,15 @@ class ImportDriverHelper
             
             return $this;
         }
-        
+
         if ('all' === $period) {
             return $this->setAcademicPeriod(
                 date('Y') - $this->num_years
             );
         }
-        
-        $this->academic_period = ($period - 1) . '20';
-        
+
+        $this->academic_period = $period;
+
         return $this;
     }
     
@@ -139,10 +169,10 @@ class ImportDriverHelper
         if ($this->academic_period) {
             $start = $this->academic_period;
         } else {
-            $start = (int) ((date('Y') - $this->num_years) . '00');
+            $start = date('Y') - $this->num_years;
         }
         
-        $stop = 300000;
+        $stop = date('Y') + 1;
         
         return $this;
     }
@@ -150,13 +180,17 @@ class ImportDriverHelper
     /**
      * Validate the service ID.
      * 
-     * @param string $id
+     * @param string $source
      *
      * @return bool
      */
-    public static function isValidImportId($id)
+    public static function isValidImportSource($source)
     {
-        return in_array($id, ['book', 'ods']);
+        if (in_array($source, ['book', 'ods'])) {
+            return true;
+        }
+
+        return file_exists($source);
     }
     
     /**
@@ -190,13 +224,10 @@ class ImportDriverHelper
         $manager = $this->doctrine->getManager();
         $repo    = $manager->getRepository(UpdateLog::class);
         $logs    = $repo->findBy([], ['start' => 'DESC'], 31);
-        
+
         // For re-storing purposes, store from oldest to newest.
-        foreach (array_reverse($logs) as $log) {
-            $manager->detach($log);
-            
-            $this->logs[] = $log;
-        }
+        $this->logs[] = array_reverse($logs);
+        $manager->clear(UpdateLog::class);
         
         return $this;
     }

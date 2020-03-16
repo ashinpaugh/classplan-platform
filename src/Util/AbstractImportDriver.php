@@ -63,6 +63,9 @@ abstract class AbstractImportDriver
      */
     protected $limit;
 
+    /**
+     * @var string
+     */
     protected $projectDir;
     
     /**
@@ -272,7 +275,7 @@ abstract class AbstractImportDriver
     }
     
     /**
-     * @return Registry
+     * @return ManagerRegistry
      */
     protected function getDoctrine()
     {

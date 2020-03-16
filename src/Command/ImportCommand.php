@@ -40,8 +40,8 @@ class ImportCommand extends AbstractCommand
             ->addOption(
                 'source',
                 's',
-                InputOption::VALUE_OPTIONAL,
-                "The data source used to update the data. Either 'ods' or 'book'.",
+                InputOption::VALUE_REQUIRED,
+                "The data source used to update the data. Either 'ods', 'book', or a full file path to an export of TheBook.",
                 'ods'
             )->addOption(
                 'year',
@@ -49,6 +49,11 @@ class ImportCommand extends AbstractCommand
                 InputOption::VALUE_OPTIONAL,
                 'The starting year to import. IE: 2015',
                 'all'
+            )->addOption(
+                'update-buildings',
+                'b',
+                InputOption::VALUE_NONE,
+                'Run the update building after the import completes.'
             )->setHelp('Import data from varying sources into the database.')
         ;
     }
@@ -60,14 +65,33 @@ class ImportCommand extends AbstractCommand
     {
         ini_set('memory_limit', '4096M');
 
+        $code = $this->loadFixtures($input, $output);
+
+        if (!$input->getOption('update-buildings')) {
+            return $code;
+        }
+
+        return $this->updateBuildings($input, $output);
+    }
+
+    /**
+     * Import content into the main DB.
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     *
+     * @return int|mixed
+     */
+    protected function loadFixtures(InputInterface $input, OutputInterface $output)
+    {
         $source = $input->getOption('source');
         $period = $input->getOption('year');
 
         $command = $this->getApplication()->find('doctrine:fixtures:load');
         $args    = new ArrayInput([
-            'command' => 'doctrine:fixtures:load',
+            'command'               => 'doctrine:fixtures:load',
             '--purge-with-truncate' => true,
-            '--no-debug' => true,
+            '--no-debug'            => true,
         ]);
 
         $args->setInteractive(false);
@@ -79,14 +103,38 @@ class ImportCommand extends AbstractCommand
                 ->toggleFKChecks(false)
             ;
 
-            $command->run($args, $output);
-
-            return 0;
+            return $command->run($args, $output);
         } catch (\ErrorException $e) {
             $output->writeln('An error occurred: ' . $e->getMessage());
             return $e->getCode();
         } catch (\Exception $e) {
             $output->writeln('An error occurred executing [doctrine:fixtures:load]: ' . $e->getMessage());
+            return $e->getCode();
+        }
+    }
+
+    /**
+     * Runs the update buildings command after an import.
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     *
+     * @return int|mixed
+     */
+    protected function updateBuildings(InputInterface $input, OutputInterface $output)
+    {
+        $command = $this->getApplication()->find('classplan:buildings:update');
+        $args    = new ArrayInput([
+            'command'    => 'classplan:buildings:update',
+            '--no-debug' => true,
+        ]);
+
+        $args->setInteractive(false);
+
+        try {
+            return $command->run($args, $output);
+        } catch (\Exception $e) {
+            $output->writeln('An error occurred executing [classplan:buildings:update]: ' . $e->getMessage());
             return $e->getCode();
         }
     }
