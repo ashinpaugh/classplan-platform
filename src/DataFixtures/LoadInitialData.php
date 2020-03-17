@@ -28,11 +28,18 @@ class LoadInitialData extends AbstractDataFixture
         
         $progress->start();
         $progress->setMessage('Importing initial data...');
+
+        $count = 0;
         
         while ($entry = $importer->getEntry()) {
+            $count++;
             $this->getTerm();
             $this->getRoom();
             $this->getInstructor();
+
+            if ($count % 100 === 0) {
+                $manager->flush();
+            }
             
             $importer->nextEntry();
             $progress->advance();

@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Subject;
 use App\Entity\TermBlock;
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\FetchMode;
@@ -16,7 +15,7 @@ use Doctrine\ORM\EntityRepository;
 class BuildingRepository extends EntityRepository
 {
     /**
-     *
+     * Find the buildings used for a given block.
      */
     public function findByBlock(TermBlock $block)
     {

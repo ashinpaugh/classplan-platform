@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\UpdateLog;
-use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -22,13 +21,10 @@ class DefaultController extends AbstractController
      *
      * @return Response
      */
-    public function indexAction(KernelInterface $kernel, SerializerInterface $serializer)
+    public function indexAction(KernelInterface $kernel)
     {
-        $update = $serializer->serialize($this->getLastUpdateLog(), 'json');
-
         $angular = file_get_contents($kernel->getProjectDir() . '/public/app/index.html');
         $angular = str_replace('src="', 'src="app/', $angular);
-        $angular = str_replace("'%%%cpUpdateLog%%%%'", "Object.freeze($update)", $angular);
 
         return Response::create($angular)
             ->setPublic()
