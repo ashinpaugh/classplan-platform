@@ -20,7 +20,7 @@ use Swagger\Annotations as SWG;
 class UpdateController extends AbstractController implements ClassResourceInterface
 {
     /**
-     * Get the latest UpdateLog.
+     * Get the latest update log.
      *
      * @Rest\Route("/update")
      * @Rest\View(serializerGroups={"update"})
@@ -41,7 +41,7 @@ class UpdateController extends AbstractController implements ClassResourceInterf
     }
 
     /**
-     * Poll the update log for changes in state.
+     * Poll the update log for changes in state or progress.
      *
      * @Rest\Route("/update/check")
      * @Rest\View(serializerGroups={"update"})

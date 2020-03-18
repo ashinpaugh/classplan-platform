@@ -1,10 +1,15 @@
 nelmio_api_doc:
+    models:
+        use_jms: true
+
     documentation:
         info:
             title: Class Plan
             description: A class scheduling utility.
             version: 1.0.0
+
     areas: # to filter documented areas
         path_patterns:
+            - ^/update
             - ^/term
             - ^/[^(_|download|default|doc$)]

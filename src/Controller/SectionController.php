@@ -148,6 +148,13 @@ class SectionController extends AbstractController implements ClassResourceInter
      *   requirements="\d+",
      *   description="Optional. The room id(s)."
      * )
+     * @Rest\RequestParam(
+     *   name="meetingType",
+     *   map=true,
+     *   nullable=true,
+     *   requirements="\d+",
+     *   description="Optional. The meeting types."
+     * )
      *
      * @param ParamFetcherInterface $fetcher
      * @return array
@@ -201,15 +208,21 @@ class SectionController extends AbstractController implements ClassResourceInter
             ;
         }
 
+        $filters = array_filter([
+            'block'      => $block,
+            'subject'    => $subject,
+            'course'     => $course,
+            'instructor' => $instructor,
+            'building'   => $building,
+            'room'       => $room,
+        ]);
+
+        if (($meeting_type = $fetcher->get('meetingType')) && count($meeting_type) > 0) {
+            $filters['meeting_type'] = $meeting_type;
+        }
+
         $sections = $this->getRepo(Section::class)
-            ->findBy(array_filter([
-                'block'      => $block,
-                'subject'    => $subject,
-                'course'     => $course,
-                'instructor' => $instructor,
-                'building'   => $building,
-                'room'       => $room,
-            ]))
+            ->findBy($filters)
         ;
         
         return ['sections' => $sections];
