@@ -37,12 +37,12 @@ class LoadInitialData extends AbstractDataFixture
             $this->getRoom();
             $this->getInstructor();
 
-            if ($count % 100 === 0) {
+            if ($count % 500 === 0) {
                 $manager->flush();
+                $progress->advance(500);
             }
-            
+
             $importer->nextEntry();
-            $progress->advance();
         }
         
         $manager->flush();

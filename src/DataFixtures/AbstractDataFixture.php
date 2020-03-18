@@ -18,6 +18,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -374,7 +375,7 @@ abstract class AbstractDataFixture extends Fixture implements FixtureInterface, 
     }
     
     /**
-     * @return Registry
+     * @return ManagerRegistry
      */
     protected function getDoctrine()
     {

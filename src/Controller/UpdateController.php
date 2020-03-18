@@ -24,7 +24,7 @@ class UpdateController extends AbstractController implements ClassResourceInterf
      *
      * @Rest\Route("/update")
      * @Rest\View(serializerGroups={"update"})
-     * @Cache(public=true, smaxage=15)
+     * @Cache(public=true, smaxage=3)
      *
      * @Operation(
      *   tags={"Update"},
@@ -51,22 +51,15 @@ class UpdateController extends AbstractController implements ClassResourceInterf
      *   @SWG\Response(
      *     response="200",
      *     description="Success.",
-     *     @SWG\Schema(
-     *        type="object",
-     *        @SWG\Property(property="log", ref=@Model(type=UpdateLog::class, groups={"update"})),
-     *        @SWG\Property(property="updating", type="boolean")
-     *     )
+     *     ref=@Model(type=UpdateLog::class, groups={"update"})
      *   )
      * )
      */
     public function checkAction()
     {
-        $result = $this->doPoll();
+        $this->doPoll();
 
-        return [
-            'log'      => $this->getLastUpdateLog(),
-            'updating' => $result,
-        ];
+        return $this->getLastUpdateLog();
     }
 
     /**
@@ -77,12 +70,11 @@ class UpdateController extends AbstractController implements ClassResourceInterf
     protected function doPoll()
     {
         $tries          = 0;
-        $max_tries      = 5;
+        $max_tries      = 3;
         $sleep_duration = 5;
 
-        while (($is_updating = $this->isUpdating()) && $tries <= $max_tries) {
+        while (($is_updating = $this->isUpdating()) && ++$tries <= $max_tries) {
             sleep($sleep_duration);
-            $tries++;
         }
 
         return $is_updating;

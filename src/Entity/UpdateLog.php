@@ -66,6 +66,14 @@ class UpdateLog extends AbstractEntity
      * @var string
      */
     protected $peak_memory;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Serializer\Groups(groups={"update"})
+     *
+     * @var float
+     */
+    protected $progress;
     
     /**
      * UpdateLog constructor.
@@ -183,6 +191,26 @@ class UpdateLog extends AbstractEntity
     {
         $this->peak_memory = $peak_memory;
         
+        return $this;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getProgress(): ?float
+    {
+        return $this->progress;
+    }
+
+    /**
+     * @param float $progress
+     *
+     * @return UpdateLog
+     */
+    public function setProgress(float $progress)
+    {
+        $this->progress = number_format($progress, 3);
+
         return $this;
     }
 }

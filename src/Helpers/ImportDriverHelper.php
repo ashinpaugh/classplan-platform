@@ -262,7 +262,8 @@ class ImportDriverHelper
     public function getLogEntry()
     {
         $repo = $this->doctrine->getRepository(UpdateLog::class);
+        $logs = $repo->findBy([], ['start' => 'DESC'], 1);
         
-        return current($repo->findBy([], ['start' => 'DESC'], 1));
+        return !empty($logs) ? $logs[0] : null;
     }
 }

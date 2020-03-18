@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Helpers\ImportDriverHelper;
 use Doctrine\Persistence\ObjectManager;
 
 /**
@@ -19,11 +20,10 @@ class LoadSectionData extends AbstractDataFixture
         $prev_term = null;
         $importer  = $this->getImporter(true);
         $progress  = static::getProgressBar(count($importer->getEntries()));
-        
+        $count     = 0;
+
         $progress->setMessage('Importing section data...');
 
-        $count = 0;
-        
         while ($entry = $importer->getEntry()) {
             $count++;
 
@@ -32,25 +32,29 @@ class LoadSectionData extends AbstractDataFixture
             $section = $this->getSection($course);
             $term    = $section->getBlock()->getTerm();
 
+            // First cycle.
             if (!$prev_term) {
-                // First cycle.
                 $prev_term = $term;
             }
-            
+
+            if ($count % 500 === 0) {
+                $progress->advance(500);
+            }
+
             if ($prev_term->getId() !== $term->getId()) {
-                $manager->flush();
+                $this->updateLogProgress($progress->getProgressPercent());
+
                 $manager->clear();
-                
+
                 $prev_term = $term;
-            } elseif ($count % 100 === 0) {
-                $manager->flush();
+            } elseif ($count % 1000 === 0) {
+                $this->updateLogProgress($progress->getProgressPercent());
             }
 
             $importer->nextEntry();
-            $progress->advance();
         }
-        
-        $manager->flush();
+
+        $this->updateLogProgress(1);
         $progress->finish();
         
         static::getOutput()->writeln("\n");
@@ -62,5 +66,20 @@ class LoadSectionData extends AbstractDataFixture
     public function getOrder()
     {
         return 3;
+    }
+
+    /**
+     * Update the current UpdateLog's progress percentage.
+     *
+     * @param float $progress
+     */
+    protected function updateLogProgress(float $progress)
+    {
+        $helper = $this->container->get(ImportDriverHelper::class);
+        $log    = $helper->getLogEntry();
+
+        $log->setProgress($progress);
+
+        $this->getDoctrine()->getManager()->flush();
     }
 }
