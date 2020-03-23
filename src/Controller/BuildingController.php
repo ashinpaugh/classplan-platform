@@ -24,7 +24,7 @@ class BuildingController extends AbstractController implements ClassResourceInte
      * Fetch all of the known buildings.
      *
      * @Rest\Route("/buildings")
-     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"building"})
+     * @Rest\View(serializerEnableMaxDepthChecks=true, serializerGroups={"building_full", "room"})
      *
      * @Operation(
      *   tags={"Collections", "Building"},
@@ -33,7 +33,7 @@ class BuildingController extends AbstractController implements ClassResourceInte
      *     description="Success.",
      *     @SWG\Schema(
      *       type="object",
-     *       @SWG\Property(property="buildings", type="array", @SWG\Items(ref=@Model(type=Building::class, groups={"building"})))
+     *       @SWG\Property(property="buildings", type="array", @SWG\Items(ref=@Model(type=Building::class, groups={"building_full", "room"})))
      *     )
      *   )
      * )

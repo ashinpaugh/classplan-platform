@@ -263,7 +263,8 @@ class BookImportDriver extends AbstractImportDriver
     private function isOnline(array $data)
     {
         // 18 = Building. 19 = Room. 20 = Days.
-        return !$data[18] || null === $data[19] || null === $data[20];
+        // return !$data[18] || null === $data[19] || null === $data[20];
+        return trim($data[33]) === 'WEB';
     }
     
     /**
