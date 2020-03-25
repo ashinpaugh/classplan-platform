@@ -24,7 +24,7 @@ class BookImportDriver extends AbstractImportDriver
      */
     public function init($mixed = null)
     {
-        $default = $this->projectDir . '/' . static::CSV_PATH;
+        $default = $this->project_dir . '/' . static::CSV_PATH;
         $path    = $this->helper->getPath() ?: $default;
 
         $this
@@ -55,13 +55,9 @@ class BookImportDriver extends AbstractImportDriver
      */
     public function createBuilding(Campus $campus = null)
     {
-        $campus   = $campus ?: $this->createCampus();
-        $building = new Building(
-            $campus,
-            $this->getLocation('building')
-        );
+        $campus = $campus ?: $this->createCampus();
         
-        return $building;
+        return new Building($campus, $this->getLocation('building'));
     }
     
     /**
@@ -70,13 +66,10 @@ class BookImportDriver extends AbstractImportDriver
     public function createRoom(Building $building = null)
     {
         $building = $building ?: $this->createBuilding();
-        $number   = $this->getLocation('room') ?: '0000';
-        $room     = new Room(
-            $building,
-            $number
-        );
+        // $number   = $this->getLocation('room') ?: '0000';
+        $number   = $this->getLocation('room');
         
-        return $room;
+        return new Room($building, $number);
     }
     
     /**
@@ -242,7 +235,7 @@ class BookImportDriver extends AbstractImportDriver
     private function isValidEntry(array $data)
     {
         // 0 = semester - invalid entry. 8 = status.
-        if ('...' === $data[0] || '...' === $data[8]) {
+        if ('...' === $data[0] || 'Active' !== $data[8]) {
             return false;
         }
         

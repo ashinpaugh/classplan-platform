@@ -47,6 +47,13 @@ class ImportDriverHelper
      * @var string
      */
     protected $path;
+
+    /**
+     * Whether or not to include online courses in the import.
+     *
+     * @var bool
+     */
+    protected $include_online;
     
     /**
      * ImportDriverHelper constructor.
@@ -263,7 +270,19 @@ class ImportDriverHelper
     {
         $repo = $this->doctrine->getRepository(UpdateLog::class);
         $logs = $repo->findBy([], ['start' => 'DESC'], 1);
-        
-        return !empty($logs) ? $logs[0] : null;
+
+        return current($logs);
+    }
+
+    public function getIncludeOnline(): bool
+    {
+        return $this->include_online;
+    }
+
+    public function setIncludeOnline(bool $include)
+    {
+        $this->include_online = $include;
+
+        return $this;
     }
 }

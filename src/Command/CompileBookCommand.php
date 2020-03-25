@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Helpers\ImportDriverHelper;
+use SplFileInfo;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -22,9 +23,9 @@ class CompileBookCommand extends AbstractCommand
      */
     protected $importer;
 
-    public function __construct(ImportDriverHelper $importDriverHelper)
+    public function __construct(ImportDriverHelper $import_helper)
     {
-        $this->importer = $importDriverHelper;
+        $this->importer = $import_helper;
 
         parent::__construct('classplan:book:compile');
     }
@@ -83,7 +84,7 @@ class CompileBookCommand extends AbstractCommand
 
         $total_sections = 0;
 
-        /* @var \SplFileInfo $file */
+        /* @var SplFileInfo $file */
         foreach ($finder as $file) {
             $num_sections = $this->appendFile($output_file, $file->getRealPath());
             $output->writeln($file->getRealPath() . ': ' . $num_sections);

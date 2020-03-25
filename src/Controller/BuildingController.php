@@ -41,7 +41,7 @@ class BuildingController extends AbstractController implements ClassResourceInte
     public function cgetAction()
     {
         $buildings = $this->getRepo(Building::class)
-            ->findBy([], ['short_name' => 'ASC'])
+            ->fetchAll()
         ;
 
         return ['buildings' => $buildings];

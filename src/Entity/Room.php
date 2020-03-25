@@ -44,7 +44,7 @@ class Room extends AbstractEntity
     
     /**
      * @ORM\Column(type="string")
-     * @Serializer\Groups(groups={"room", "room_full"})
+     * @Serializer\Exclude()
      *
      * @var string
      */
@@ -81,11 +81,15 @@ class Room extends AbstractEntity
     }
     
     /**
+     * @Serializer\VirtualProperty(name="number")
+     * @Serializer\Groups(groups={"room", "room_full"})
+     * @Serializer\Type("string")
+     *
      * @return mixed
      */
     public function getNumber()
     {
-        return $this->number;
+        return $this->number ?: 'Unassigned';
     }
     
     /**

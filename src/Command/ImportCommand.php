@@ -3,6 +3,8 @@
 namespace App\Command;
 
 use App\Helpers\ImportDriverHelper;
+use ErrorException;
+use Exception;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,9 +23,9 @@ class ImportCommand extends AbstractCommand
      */
     protected $importer;
 
-    public function __construct(ImportDriverHelper $importDriverHelper)
+    public function __construct(ImportDriverHelper $import_helper)
     {
-        $this->importer = $importDriverHelper;
+        $this->importer = $import_helper;
 
         parent::__construct('classplan:import');
     }
@@ -50,6 +52,12 @@ class ImportCommand extends AbstractCommand
                 'The starting year to import. IE: 2015',
                 'all'
             )->addOption(
+                'online',
+                'o',
+                InputOption::VALUE_OPTIONAL,
+                'Whether to include online courses in the import.',
+                true
+            )->addOption(
                 'update-buildings',
                 'b',
                 InputOption::VALUE_NONE,
@@ -71,7 +79,7 @@ class ImportCommand extends AbstractCommand
             return $code;
         }
 
-        return $this->updateBuildings($input, $output);
+        return $this->updateBuildings($output);
     }
 
     /**
@@ -86,6 +94,7 @@ class ImportCommand extends AbstractCommand
     {
         $source = $input->getOption('source');
         $period = $input->getOption('year');
+        $online = $input->getOption('online');
 
         $command = $this->getApplication()->find('doctrine:fixtures:load');
         $args    = new ArrayInput([
@@ -100,14 +109,15 @@ class ImportCommand extends AbstractCommand
             $this->importer
                 ->setServiceId($source)
                 ->setAcademicPeriod($period)
+                ->setIncludeOnline($online)
                 ->toggleFKChecks(false)
             ;
 
             return $command->run($args, $output);
-        } catch (\ErrorException $e) {
+        } catch (ErrorException $e) {
             $output->writeln('An error occurred: ' . $e->getMessage());
             return $e->getCode();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $output->writeln('An error occurred executing [doctrine:fixtures:load]: ' . $e->getMessage());
             return $e->getCode();
         }
@@ -116,12 +126,11 @@ class ImportCommand extends AbstractCommand
     /**
      * Runs the update buildings command after an import.
      *
-     * @param InputInterface $input
      * @param OutputInterface $output
      *
      * @return int|mixed
      */
-    protected function updateBuildings(InputInterface $input, OutputInterface $output)
+    protected function updateBuildings(OutputInterface $output)
     {
         $command = $this->getApplication()->find('classplan:buildings:update');
         $args    = new ArrayInput([
@@ -133,7 +142,7 @@ class ImportCommand extends AbstractCommand
 
         try {
             return $command->run($args, $output);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $output->writeln('An error occurred executing [classplan:buildings:update]: ' . $e->getMessage());
             return $e->getCode();
         }

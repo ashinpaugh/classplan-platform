@@ -72,7 +72,7 @@ class SetupCommand extends AbstractCommand
 
         return 0;
     }
-    
+
     /**
      * Passing the env option to the sub-command is ignored. The output says prod, but
      * builds the assets in the same environment that the :setup command was
@@ -81,6 +81,7 @@ class SetupCommand extends AbstractCommand
      * @param OutputInterface $output
      *
      * @return $this
+     * @throws \Exception
      */
     private function prepareAssets(OutputInterface $output)
     {

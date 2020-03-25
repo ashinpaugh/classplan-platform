@@ -44,4 +44,31 @@ class BuildingRepository extends EntityRepository
 
         return $this->findById($building_ids);
     }
+
+    public function fetchAll($exclude_empty = true)
+    {
+        $where = $exclude_empty
+            ? "WHERE b.short_name != '' AND r.number != ''"
+            : ''
+        ;
+
+        /* @var Connection $conn */
+        $conn      = $this->getEntityManager()->getConnection();
+        $statement = $conn->prepare("
+            SELECT r.building_id
+            FROM building AS b
+            JOIN room AS r ON r.building_id = b.id
+            {$where}
+            ORDER BY b.campus_id, LOWER(b.full_name), LOWER(b.short_name)
+        ");
+
+        $statement->execute();
+        $building_ids = $statement->fetchAll(FetchMode::COLUMN);
+
+        if (empty($building_ids)) {
+            return [];
+        }
+
+        return $this->findById($building_ids);
+    }
 }

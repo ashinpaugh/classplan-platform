@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\Building;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,6 +27,16 @@ class UpdateBuildingsCommand extends AbstractCommand
      */
     protected $doctrine;
 
+    /**
+     * @var string
+     */
+    protected $building_directory;
+
+    /**
+     * @var string[]
+     */
+    protected $building_dictionary;
+
     public function __construct(
         EntityManagerInterface $doctrine,
         KernelInterface $kernel
@@ -33,7 +44,17 @@ class UpdateBuildingsCommand extends AbstractCommand
         parent::__construct('classplan:buildings:update');
 
         $this->doctrine = $doctrine;
-        $this->projectDir = $kernel->getProjectDir();
+        $this->project_dir = $kernel->getProjectDir();
+    }
+
+    /**
+     * @param string $directory
+     * @param array $dictionary
+     */
+    public function setBuildingDirectory(string $directory, array $dictionary)
+    {
+        $this->building_directory  = $directory;
+        $this->building_dictionary = $dictionary;
     }
 
     /**
@@ -51,12 +72,12 @@ class UpdateBuildingsCommand extends AbstractCommand
     /**
      * {@inheritDoc}
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $this->doUpdate($input, $output);
+            $this->doUpdate($output);
 
             return 0;
         } catch (LogicException $e) {
@@ -65,7 +86,7 @@ class UpdateBuildingsCommand extends AbstractCommand
         }
     }
 
-    protected function doUpdate(InputInterface $input, OutputInterface $output)
+    protected function doUpdate(OutputInterface $output)
     {
         $metadata = $this->getBuildingMeta($output);
 
@@ -73,22 +94,16 @@ class UpdateBuildingsCommand extends AbstractCommand
         $buildings = $repo->findAll();
 
         foreach ($buildings as $building) {
-            $building_meta = array_filter($metadata, function (array $item) use ($building, $output) {
-                return $building->getShortname() === $item['abbr'];
-            });
-
-            if (empty($building_meta)) {
-                $output->writeln('OU directory missing: ' . $building->getShortname());
+            if (in_array($building->getShortname(), ['', 'WEB'])) {
                 continue;
             }
 
-            $meta = current($building_meta);
-            $building
-                ->setCode($meta['code'])
-                ->setFullName($meta['name'])
-            ;
+            if (array_key_exists($building->getShortname(), $this->building_dictionary)) {
+                $this->setBuildingMetadata($building, $this->building_dictionary[$building->getShortname()]);
+                continue;
+            }
 
-            $this->doctrine->persist($building);
+            $this->parseDirectoryListing($output, $building, $metadata);
         }
 
         $this->doctrine->flush();
@@ -96,19 +111,17 @@ class UpdateBuildingsCommand extends AbstractCommand
 
     protected function getBuildingMeta(OutputInterface $output)
     {
+        $info = null;
+
         try {
-            $scrape = $this->scrapeBuildingInfo($output);
+            $info = $this->scrapeBuildingInfo();
         } catch (HttpExceptionInterface $exception) {
             $output->write('HttpException: ' . $exception->getMessage());
         } catch (ExceptionInterface $exception) {
             $output->write('Exception: ' . $exception->getMessage());
         }
 
-        if (!empty($scrape) && count($scrape) > 0) {
-            return $scrape;
-        }
-
-        throw new LogicException('Implement scrape backup logic.');
+        return $info;
     }
 
     /**
@@ -116,10 +129,10 @@ class UpdateBuildingsCommand extends AbstractCommand
      * @throws HttpExceptionInterface
      * @throws ExceptionInterface
      */
-    protected function scrapeBuildingInfo(OutputInterface $output)
+    protected function scrapeBuildingInfo()
     {
         $client   = HttpClient::create();
-        $response = $client->request('GET', 'https://directory.ouhsc.edu/Contacts/BuildingLocations.aspx');
+        $response = $client->request('GET', $this->building_directory);
         $content  = $response->getContent(true);
 
         $crawler = new Crawler($content);
@@ -139,5 +152,35 @@ class UpdateBuildingsCommand extends AbstractCommand
                 'name' => $columns->eq(3)->text(),
             ];
         });
+    }
+
+    protected function parseDirectoryListing(OutputInterface $output, Building $building, $metadata)
+    {
+        if (empty($metadata)) {
+            return;
+        }
+
+        $building_meta = array_filter($metadata, function (array $item) use ($building, $output) {
+            return $building->getShortname() === $item['abbr'];
+        });
+
+        if (empty($building_meta)) {
+            $output->writeln('OU directory missing: ' . $building->getShortname());
+            return;
+        }
+
+        $meta = current($building_meta);
+        $this->setBuildingMetadata($building, $meta['name'], $meta['code']);
+    }
+
+    protected function setBuildingMetadata(Building $building, $full_name, $code = null)
+    {
+        $building->setFullName($full_name);
+
+        if (null !== $code) {
+            $building->setCode($code);
+        }
+
+        $this->doctrine->persist($building);
     }
 }

@@ -19,13 +19,12 @@ class LoadInitialData extends AbstractDataFixture
      */
     public function load(ObjectManager $manager)
     {
-        $this->container->get(ImportDriverHelper::class)
-            ->toggleFKChecks(true)
-        ;
-        
+        $helper   = $this->container->get(ImportDriverHelper::class);
         $importer = $this->getImporter(true);
         $progress = static::getProgressBar(count($importer->getEntries()));
-        
+
+        $helper->toggleFKChecks(true);
+
         $progress->start();
         $progress->setMessage('Importing initial data...');
 

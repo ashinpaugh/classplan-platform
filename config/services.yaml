@@ -3,6 +3,11 @@
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+
+imports:
+    - { resource: "./building_config.yaml" }
+
+
 parameters:
     num_years_to_import: 4
 
@@ -30,12 +35,15 @@ services:
     App\Command\ImportCommand:
         calls:
             - [ setProjectDir, [ "@kernel" ] ]
+
     App\Command\SetupCommand:
         calls:
             - [ setProjectDir, [ "@kernel" ] ]
+
     App\Command\UpdateBuildingsCommand:
         calls:
             - [ setProjectDir, [ "@kernel" ] ]
+            - [ setBuildingDirectory, [ "%building_directory%", "%building_hash%" ] ]
 
     App\Helpers\ImportDriverHelper:
         public: true

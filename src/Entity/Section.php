@@ -622,9 +622,13 @@ class Section extends AbstractEntity
      */
     public function setRoom(Room $room)
     {
+        if (empty($room->getNumber())) {
+            return $this;
+        }
+
         $this->room = $room;
         
-        return $this->setBuilding($room->getBuilding());
+        return $this;
     }
 
     /**
@@ -634,6 +638,10 @@ class Section extends AbstractEntity
      */
     public function setBuilding(Building $building)
     {
+        if (empty($building->getShortname())) {
+            return $this;
+        }
+
         $this->building = $building;
 
         return $this;

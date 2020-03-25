@@ -14,7 +14,6 @@ use App\Entity\Term;
 use App\Entity\TermBlock;
 use App\Helpers\ImportDriverHelper;
 use App\Util\AbstractImportDriver;
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
@@ -275,14 +274,16 @@ abstract class AbstractDataFixture extends Fixture implements FixtureInterface, 
     {
         $course  = $course ?: $this->getCourse();
         $section = $this->getImporter()->createSection();
+        $room    = $this->getRoom();
         
         $section
-            ->setCourse($course)
             ->setCampus($this->getCampus())
+            ->setBuilding($room->getBuilding())
+            ->setRoom($room)
             ->setBlock($this->getTerm())
             ->setInstructor($this->getInstructor())
-            ->setRoom($this->getRoom())
             ->setSubject($this->getSubject())
+            ->setCourse($course)
         ;
         
         $course->addSection($section);

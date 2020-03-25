@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 abstract class AbstractCommand extends Command
 {
-    protected $projectDir;
+    protected $project_dir;
 
     public function __construct(string $name = null)
     {
@@ -21,7 +21,7 @@ abstract class AbstractCommand extends Command
 
     public function setProjectDir(KernelInterface $kernel)
     {
-        $this->projectDir = $kernel->getProjectDir();
+        $this->project_dir = $kernel->getProjectDir();
     }
 
     /**
@@ -31,7 +31,6 @@ abstract class AbstractCommand extends Command
      */
     public function getConsolePath()
     {
-        // return 'php ' . $this->getAppRoot() . '/bin/console';
-        return '$(which php) ' . $this->projectDir . '/bin/console';
+        return '$(which php) ' . $this->project_dir . '/bin/console';
     }
 }

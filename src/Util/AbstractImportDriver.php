@@ -11,6 +11,7 @@ use App\Entity\Section;
 use App\Entity\Subject;
 use App\Entity\TermBlock;
 use App\Helpers\ImportDriverHelper;
+use DateTime;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -66,7 +67,7 @@ abstract class AbstractImportDriver
     /**
      * @var string
      */
-    protected $projectDir;
+    protected $project_dir;
     
     /**
      * AbstractImportDriver constructor.
@@ -79,13 +80,13 @@ abstract class AbstractImportDriver
         ImportDriverHelper $helper,
         KernelInterface $kernel
     ) {
-        $this->projectDir = $kernel->getProjectDir();
-        $this->doctrine = $doctrine;
-        $this->helper   = $helper;
+        $this->project_dir = $kernel->getProjectDir();
+        $this->doctrine    = $doctrine;
+        $this->helper      = $helper;
         
-        $this->entries  = [];
-        $this->online   = false;
-        $this->location = null;
+        $this->entries     = [];
+        $this->online      = false;
+        $this->location    = null;
         
         $this->disableDoctrineLogging();
     }
@@ -253,25 +254,11 @@ abstract class AbstractImportDriver
     }
     
     /**
-     * Whether to include online courses or not.
-     * 
-     * @param boolean $flag
-     *
-     * @return $this
-     */
-    public function setIncludeOnline($flag)
-    {
-        $this->online = $flag;
-        
-        return $this;
-    }
-    
-    /**
      * @return bool
      */
     public function getIncludeOnline()
     {
-        return $this->online;
+        return $this->helper->getIncludeOnline();
     }
     
     /**
@@ -281,21 +268,22 @@ abstract class AbstractImportDriver
     {
         return $this->doctrine;
     }
-    
+
     /**
      * Format the date string.
-     * 
+     *
      * @param string $date
      *
-     * @return \DateTime
+     * @return DateTime
+     * @throws \Exception
      */
     protected function getDate($date)
     {
-        if ($date instanceof \DateTime) {
+        if ($date instanceof DateTime) {
             return $date;
         }
         
-        return new \DateTime($date);
+        return new DateTime($date);
     }
     
     /**

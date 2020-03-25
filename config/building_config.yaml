@@ -1,0 +1,81 @@
+parameters:
+  building_directory: https://directory.ouhsc.edu/Contacts/BuildingLocations.aspx
+
+  building_hash:
+#    FH: Faculty House
+#    # FH: Felgar Hall (13)
+#    LC1: Learning Center
+#    # DEH: Don E. Hogg Greenhouse
+#    # DEH: Devon Energy Hall (7)
+#    SAS: Architectural Studio, SHSC
+#    SPP: Classroom Building, SHSC
+#    SCC: Conference Center, SHSC
+#    SAC: Academic Center, SHSC
+#    LBT: Library - Tulsa
+#    ASC: Academic Support Center, SHSC
+
+    AH: Adams Hall
+    MFPH: Michael F. Price Hall
+    DAH: Dale Hall
+    DEH: Devon Energy Hall
+    FH: Felgar Hall
+
+    # Taken from https://www.cs.ou.edu/~diochnos/about/OUMap2010Jun.pdf
+    AOM1: ARC on Main Inst. (504 W. Main)
+    ARM: Armory
+    BL: Bizzell Library
+    BL1: Bizzell Library
+    BURT: Burton Hall
+    CARN: Carnegie Building
+    CEC: Carson Engineering Center
+    CH: Carpenter Hall
+    CHB: Chemistry Building
+    CHBA: Chemistry Building Annex
+    CMC: Catlett Music Center
+    COH: Copeland Hall
+    COLM: Collums Building
+    CRAD: Craddock Hall
+    CRSD: Cross Center Bldg. D
+    CRSM: Cross Center Main
+    CSKF: Ceramic Kiln Facility
+    DAHT: Dale Hall Tower
+    DLBH: David L. Boren Hall
+    ECH: Ellsworth Collings Hall
+    EL: Engineering Lab
+    FAC: Fine Arts Center
+    FIH: McCasland Field House
+    FJC: Fred Jones Art Center
+    FL: Fears Lab
+    FORM: Forum Building
+    GH: Gould Hall
+    GIH: Gittinger Hall
+    GLCH: George Lynn Cross Hall
+    GLRD: Gaylord Hall
+    HEST: Hester Hall
+    HHC: Huston Huffman Center
+    JFH: Jacobson Faculty Hall
+    KH: Kaufman Hall
+    LAW: Andrew M. Coats Hall
+    LCWH: Lissa and Cy Wagner Hall
+    MH: Monnet Hall
+    NH: Nielsen Hall
+    NML: Noble Microscopy Lab
+    NWC: National Weather Center
+    N101: Airport Operations, North Campus
+    S134: SC Building 134
+    OFC: Old Faculty Club
+    OMS: Oklahoma Memorial Stadium
+    OMNH: Sam Noble Oklahoma Museum of Natural History
+    OMU: Oklahoma Memorial Union
+    PHSC: Physical Sciences Center
+    POOL: Murray Case Sells Swim Complex
+    RH: Richards Hall
+    RHA: Richards Hall Addition
+    RHYN: Rhyne Hall
+    RPAC: Reynolds Performing Art Center
+    SCI: Wallace Science Hall
+    SEC: Sarkeys Energy Center
+    SRTC: Stephenson Research Center
+    SUT: Sutton Hall
+    S6: Bldg. 6, South Campus (213)
+    WHIT: Whitehand Hall
