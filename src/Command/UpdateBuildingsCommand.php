@@ -148,7 +148,6 @@ class UpdateBuildingsCommand extends AbstractCommand
 
             return [
                 'abbr' => $columns->eq(2)->text(),
-                'code' => $columns->eq(1)->text(),
                 'name' => $columns->eq(3)->text(),
             ];
         });
@@ -170,16 +169,12 @@ class UpdateBuildingsCommand extends AbstractCommand
         }
 
         $meta = current($building_meta);
-        $this->setBuildingMetadata($building, $meta['name'], $meta['code']);
+        $this->setBuildingMetadata($building, $meta['name']);
     }
 
-    protected function setBuildingMetadata(Building $building, $full_name, $code = null)
+    protected function setBuildingMetadata(Building $building, $full_name)
     {
         $building->setFullName($full_name);
-
-        if (null !== $code) {
-            $building->setCode($code);
-        }
 
         $this->doctrine->persist($building);
     }

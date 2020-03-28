@@ -48,18 +48,17 @@ class BuildingRepository extends EntityRepository
     public function fetchAll($exclude_empty = true)
     {
         $where = $exclude_empty
-            ? "WHERE b.short_name != '' AND r.number != ''"
+            ? "WHERE short_name != ''"
             : ''
         ;
 
         /* @var Connection $conn */
         $conn      = $this->getEntityManager()->getConnection();
         $statement = $conn->prepare("
-            SELECT r.building_id
-            FROM building AS b
-            JOIN room AS r ON r.building_id = b.id
+            SELECT id
+            FROM building
             {$where}
-            ORDER BY b.campus_id, LOWER(b.full_name), LOWER(b.short_name)
+            ORDER BY campus_id, LOWER(full_name), LOWER(short_name)
         ");
 
         $statement->execute();

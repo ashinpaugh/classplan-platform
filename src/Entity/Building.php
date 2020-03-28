@@ -65,17 +65,6 @@ class Building extends AbstractEntity
     protected $full_name;
 
     /**
-     * The five digit ou building code.
-     *
-     * @ORM\Column(type="string", nullable=true, length=5)
-     * @Serializer\Groups(groups={"building", "building_full"})
-     * @Serializer\SkipWhenEmpty()
-     *
-     * @var string
-     */
-    protected $code;
-
-    /**
      * Building constructor.
      *
      * @param Campus $campus
@@ -86,7 +75,6 @@ class Building extends AbstractEntity
         $this
             ->setCampus($campus)
             ->setShortname($abbreviation)
-            ->setCode($code)
             ->setFullName($name)
         ;
         
@@ -221,23 +209,4 @@ class Building extends AbstractEntity
 
         return $this;
     }
-
-    /**
-     * @return string
-     */
-    public function getCode(): ?string
-    {
-        return $this->code;
-    }
-
-    /**
-     * @param string $code
-     */
-    public function setCode(?string $code)
-    {
-        $this->code = Encoding::toUTF8($code);
-
-        return $this;
-    }
-
 }
