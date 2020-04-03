@@ -48,7 +48,7 @@ class DownloadController extends AbstractController
                     $section['maximum_enrollment'],
                     $sdate->format('n/j/Y'),
                     $edate->format('n/j/Y'),
-                    $section['building']['name'],
+                    !empty($section['building']) ? $section['building']['name'] : '',
                     $section['room']['number'],
                     $section['days'],
                     $section['start_time'],
