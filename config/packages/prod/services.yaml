@@ -1,0 +1,19 @@
+
+parameters:
+  redis.host: 127.0.0.1
+  redis.port: 6379
+  redis.database: 13
+
+
+services:
+  redis_cache:
+    class: Doctrine\Common\Cache\RedisCache
+    calls:
+      - [ setRedis, [ '@redis' ] ]
+  
+  redis:
+    class: Redis
+    public: false
+    calls:
+      - [ connect, [ '%redis.host%', '%redis.port%' ] ]
+      - [ select, [ '%redis.database%' ] ]
