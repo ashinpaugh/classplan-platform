@@ -1,0 +1,20 @@
+stages:
+    - build
+    - deploy
+
+build:
+    script:
+        # echo "Removing cache..."
+        # sudo rm -rf ./var/cache/pro*
+        - echo "Installing composer..."
+        - composer i
+        - echo "Dumping vendor auto-loader..."
+        - composer dump-autoload -oa
+        - echo "Adjusting permissions..."
+        - sudo chown -R www-data:www-data ./var/cache
+        - echo "Clearing env cache..."
+        - php bin/console cache:clear --env=prod && php bin/console cache:clear --env=dev
+
+deploy:
+    script:
+        - echo "Deploy (todo)"
