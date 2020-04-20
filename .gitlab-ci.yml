@@ -3,6 +3,7 @@ stages:
     - deploy
 
 build:
+    stage: build
     script:
         # echo "Removing cache..."
         # sudo rm -rf ./var/cache/pro*
@@ -16,5 +17,6 @@ build:
         - php bin/console cache:clear --env=prod && php bin/console cache:clear --env=dev
 
 deploy:
+    stage: deploy
     script:
         - echo "Deploy (todo)"
