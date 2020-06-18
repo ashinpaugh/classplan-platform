@@ -2,12 +2,12 @@
     "type": "project",
     "license": "proprietary",
     "require": {
-        "php": "^7.3.0",
+        "php": "^7.2.0",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-json": "*",
         "ext-pdo": "*",
-        "friendsofsymfony/rest-bundle": "^2.8@dev",
+        "friendsofsymfony/rest-bundle": "^2.7",
         "jms/serializer-bundle": "^3.5",
         "neitanod/forceutf8": "^2.0",
         "nelmio/api-doc-bundle": "^3.0",
@@ -39,8 +39,7 @@
         "symfony/debug-pack": "^1.0",
         "symfony/maker-bundle": "^1.0",
         "symfony/profiler-pack": "^1.0",
-        "symfony/test-pack": "^1.0",
-        "symfony/web-server-bundle": "4.4.*"
+        "symfony/test-pack": "^1.0"
     },
     "config": {
         "preferred-install": {
