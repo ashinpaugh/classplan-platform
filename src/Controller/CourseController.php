@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Course;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\Operation;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
@@ -12,11 +11,9 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 /**
  * Course controller.
  *
- * @Rest\RouteResource("Course", pluralize=false)
- *
  * @author Austin Shinpaugh <ashinpaugh@ou.edu>
  */
-class CourseController extends AbstractController implements ClassResourceInterface
+class CourseController extends AbstractController
 {
 
     /**

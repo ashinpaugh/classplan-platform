@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Instructor;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Operation;
@@ -11,12 +10,10 @@ use Swagger\Annotations as SWG;
 
 /**
  * The instructor controller.
- *
- * @Rest\RouteResource("Instructor", pluralize=false)
  * 
  * @author Austin Shinpaugh <ashinpaugh@ou.edu>
  */
-class InstructorController extends AbstractController implements ClassResourceInterface
+class InstructorController extends AbstractController
 {
     /**
      * Fetches all the known instructors.

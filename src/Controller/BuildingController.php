@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Building;
 use App\Entity\Room;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\Operation;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
@@ -13,11 +12,9 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 /**
  * Building controller.
  *
- * @Rest\RouteResource("Building", pluralize=false)
- *
  * @author Austin Shinpaugh <ashinpaugh@ou.edu>
  */
-class BuildingController extends AbstractController implements ClassResourceInterface
+class BuildingController extends AbstractController
 {
 
     /**

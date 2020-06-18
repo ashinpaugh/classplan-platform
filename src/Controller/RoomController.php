@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Room;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\Operation;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
@@ -12,11 +11,9 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 /**
  * Building controller.
  *
- * @Rest\RouteResource("Room", pluralize=false)
- *
  * @author Austin Shinpaugh <ashinpaugh@ou.edu>
  */
-class RoomController extends AbstractController implements ClassResourceInterface
+class RoomController extends AbstractController
 {
     /**
      * Fetch a specific room.

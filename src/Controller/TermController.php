@@ -9,19 +9,16 @@ use App\Entity\Subject;
 use App\Entity\Term;
 use App\Entity\TermBlock;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Operation;
 use Swagger\Annotations as SWG;
 
 /**
  * Term controller.
- *
- * @Rest\RouteResource("Term", pluralize=false)
  * 
  * @author Austin Shinpaugh <ashinpaugh@ou.edu>
  */
-class TermController extends AbstractController implements ClassResourceInterface
+class TermController extends AbstractController
 {
     /**
      * Fetch a collection of terms and term blocks.

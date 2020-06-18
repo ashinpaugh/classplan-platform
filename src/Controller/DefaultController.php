@@ -2,10 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\UpdateLog;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Homepage.
@@ -26,9 +24,6 @@ class DefaultController extends AbstractController
         $angular = file_get_contents($kernel->getProjectDir() . '/public/app/index.html');
         $angular = str_replace('src="', 'src="app/', $angular);
 
-        return Response::create($angular)
-            ->setPublic()
-            ->setSharedMaxAge(86400)
-        ;
+        return new Response($angular);
     }
 }

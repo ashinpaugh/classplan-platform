@@ -10,7 +10,6 @@ use App\Entity\Section;
 use App\Entity\Subject;
 use App\Entity\TermBlock;
 use FOS\RestBundle\Request\ParamFetcherInterface;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Operation;
 use Swagger\Annotations as SWG;
@@ -19,12 +18,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 
 /**
  * The endpoint used when interacting with events.
- *
- * @Rest\RouteResource("Section", pluralize=false)
  * 
  * @author Austin Shinpaugh <ashinpaugh@ou.edu>
  */
-class SectionController extends AbstractController implements ClassResourceInterface
+class SectionController extends AbstractController
 {
     /**
      * Get a section.

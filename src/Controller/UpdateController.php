@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\UpdateLog;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Operation;
@@ -13,20 +12,24 @@ use Swagger\Annotations as SWG;
 /**
  * The update controller.
  *
- * @Rest\RouteResource("Update", pluralize=false)
- *
- * @author Austin Shinpaugh <ashinpaugh@ou.edu>
+ * @SWG\Swagger(
+ *     @SWG\Info(title="Update API", version="1.0"),
+ *     x={"format-suffix": {
+ *         "enabled": true,
+ *         "pattern": "json|xml"
+ *     }},
+ * )
  */
-class UpdateController extends AbstractController implements ClassResourceInterface
+class UpdateController extends AbstractController
 {
     /**
      * Get the latest update log.
      *
-     * @Rest\Route("/update")
      * @Rest\View(serializerGroups={"update"})
      * @Cache(public=true, smaxage=3)
      *
-     * @Operation(
+     * @SWG\Get(
+     *   path="/update",
      *   tags={"Update"},
      *   @SWG\Response(
      *     response="200",

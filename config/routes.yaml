@@ -1,6 +1,10 @@
+#openapi_routes:
+#  resource: Tobion\OpenApiSymfonyRouting\OpenApiRouteLoader
+#  type: service
+
 api:
   resource: ../src/Controller/
-  type: rest
+  type: annotation
   defaults: { _format: json }
 
 index:

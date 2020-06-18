@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Course;
 use App\Entity\Subject;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Operation;
@@ -12,12 +11,10 @@ use Swagger\Annotations as SWG;
 
 /**
  * Loads a subject.
- *
- * @Rest\RouteResource("Subject", pluralize=false)
  * 
  * @author Austin Shinpaugh <ashinpaugh@ou.edu>
  */
-class SubjectController extends AbstractController implements ClassResourceInterface
+class SubjectController extends AbstractController
 {
     /**
      * Get the list of all known subjects.

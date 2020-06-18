@@ -4,14 +4,13 @@ fos_rest:
     body_listener: true
     allowed_methods_listener: true
 
-    routing_loader:
-        default_format: json
-        include_format: true
-        parse_controller_name: false
+
+    routing_loader: false
+#    routing_loader:
+#        default_format: json
+#        include_format: true
 
     view:
-        default_engine: null
-        force_redirects: []
         view_response_listener: true
         formats:
             json: true
@@ -21,11 +20,12 @@ fos_rest:
         rules:
             - { path: '^/*', priorities: [ 'json', 'html', '*/*'], fallback_format: 'html' }
 
-    service:
-        templating: null
+#    service:
+#        templating: null
 
-    exception:
-        exception_controller: 'fos_rest.exception.controller::showAction'
+#    exception:
+#        serialize_exceptions: false
+#        exception_controller: 'fos_rest.exception.controller::showAction'
 
 #        codes:
 #            App\Exception\MyException: 403
