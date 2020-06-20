@@ -1,0 +1,14 @@
+parameters:
+  # Local DB.
+  database_host:     10.26.192.193
+  database_port:     3306
+  database_name:     classplan
+  database_user:     ashinpaugh
+  database_password: ~
+
+  # Import DB.
+  ods_db_host: 10.26.192.193
+  ods_db_port: 3306
+  ods_db_name: classnav
+  ods_db_user: ashinpaugh
+  ods_db_password: ~
