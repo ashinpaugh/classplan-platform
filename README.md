@@ -8,7 +8,7 @@ Scheduling utility for the University of Oklahoma.
 Create a file named ```.env.local``` with your connection information. See ```.env``` for
 more details. eg:
 
-    DATABASE_URL=mysql://root:root@127.0.0.1:3306/classplan?serverVersion=5.7
+    CLASSPLAN_DATABASE_URL=mysql://root:root@127.0.0.1:3306/classplan?serverVersion=5.7
 
 #####Production
 Create a file named ```.env.local``` with your staging credentials. eg:
