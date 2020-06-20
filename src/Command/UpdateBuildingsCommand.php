@@ -15,8 +15,7 @@ use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 
 /**
- * Command that should be run after setting the environmental vars
- * in parameters.yml.
+ * Updates imported building names with their long names.
  *
  * @author Austin Shinpaugh
  */
