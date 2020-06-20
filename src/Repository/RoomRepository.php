@@ -9,7 +9,7 @@ use Doctrine\DBAL\FetchMode;
 use Doctrine\ORM\EntityRepository;
 
 /**
- * Instructor repository.
+ * Room repository.
  *
  * @author Austin Shinpaugh
  */

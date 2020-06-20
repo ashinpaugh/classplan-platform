@@ -2,13 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Building;
-use App\Entity\Course;
-use App\Entity\Instructor;
-use App\Entity\Room;
 use App\Entity\Section;
-use App\Entity\Subject;
-use App\Entity\TermBlock;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -161,71 +155,7 @@ class SectionController extends AbstractController implements ClassResourceInter
      */
     public function findAction(ParamFetcherInterface $fetcher)
     {
-        $block       = null;
-        $subject     = null;
-        $course      = null;
-        $instructor  = null;
-        $building    = null;
-        $room        = null;
-
-        /*if (!$this->checkTimestamp($fetcher->get('u'))) {
-            throw new ConflictHttpException();
-        }*/
-
-        if ($block_id = $fetcher->get('block')) {
-            $block = $this->getRepo(TermBlock::class)
-                ->findById($block_id)
-            ;
-        }
-
-        if ($subject_id = $fetcher->get('subject')) {
-            $subject = $this->getRepo(Subject::class)
-                ->findById($subject_id)
-            ;
-        }
-
-        if ($course_id = $fetcher->get('course')) {
-            $course = $this->getRepo(Course::class)
-                ->findById($course_id)
-            ;
-        }
-
-        if ($instructor_id = $fetcher->get('instructor')) {
-            $instructor = $this->getRepo(Instructor::class)
-                ->findById($instructor_id)
-            ;
-        }
-
-        if ($building_id = $fetcher->get('building')) {
-            $building = $this->getRepo(Building::class)
-                ->findById($building_id)
-            ;
-        }
-
-        if ($room_id = $fetcher->get('room')) {
-            $room = $this->getRepo(Room::class)
-                ->findById($room_id)
-            ;
-        }
-
-        $filters = array_filter([
-            'block'      => $block,
-            'subject'    => $subject,
-            'course'     => $course,
-            'instructor' => $instructor,
-            'building'   => $building,
-            'room'       => $room,
-        ]);
-
-        if (($meeting_type = $fetcher->get('meetingType')) && count($meeting_type) > 0) {
-            $filters['meeting_type'] = $meeting_type;
-        }
-
-        $sections = $this->getRepo(Section::class)
-            ->findBy($filters)
-        ;
-        
-        return ['sections' => $sections];
+        return ['sections' => $this->getRepo(Section::class)->fetchAll($fetcher)];
     }
     
     /**

@@ -8,7 +8,7 @@ use JMS\Serializer\Annotation as Serializer;
 /**
  * The Section table represents instances of course sections.
  * 
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="App\Repository\SectionRepository")
  * @ORM\Table(name="section")
  */
 class Section extends AbstractEntity
