@@ -39,30 +39,41 @@ class ImportCommand extends AbstractCommand
 
         $this
             ->setDescription('Populate the database.')
+            ->setHelp('Import data using one of the specified drivers to populate the database.')
             ->addOption(
                 'source',
                 's',
                 InputOption::VALUE_REQUIRED,
                 "The data source used to update the data. Either 'ods', 'book', or a full file path to an export of TheBook.",
                 'ods'
-            )->addOption(
+            )
+            ->addOption(
                 'year',
                 'y',
                 InputOption::VALUE_OPTIONAL,
-                'The starting year to import. IE: 2015',
+                'The starting year to import. IE: 2019',
                 'all'
-            )->addOption(
+            )
+            ->addOption(
                 'online',
                 'o',
                 InputOption::VALUE_OPTIONAL,
                 'Whether to include online courses in the import.',
                 true
-            )->addOption(
+            )
+            ->addOption(
                 'update-buildings',
                 'b',
                 InputOption::VALUE_NONE,
                 'Run the update building after the import completes.'
-            )->setHelp('Import data from varying sources into the database.')
+            )
+            ->addOption(
+                'memory',
+                'm',
+                InputOption::VALUE_OPTIONAL,
+                'The memory limit set while running this command.',
+                '4096M'
+            )
         ;
     }
 
@@ -71,7 +82,7 @@ class ImportCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        ini_set('memory_limit', '4096M');
+        ini_set('memory_limit', $input->getOption('memory'));
 
         $code = $this->loadFixtures($input, $output);
 

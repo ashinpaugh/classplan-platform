@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use DateTime;
 use App\Entity\UpdateLog;
 use App\Helpers\ImportDriverHelper;
 use Doctrine\Persistence\ObjectManager;
@@ -25,7 +26,7 @@ class OnCompleteFixture extends AbstractDataFixture
         $log = $helper->getLogEntry();
         
         $log
-            ->setEnd(new \DateTime())
+            ->setEnd(new DateTime())
             ->setPeakMemory(memory_get_peak_usage())
             ->setStatus(UpdateLog::COMPLETED)
         ;
@@ -33,14 +34,6 @@ class OnCompleteFixture extends AbstractDataFixture
         $manager->flush();
         
         static::getOutput()->writeln("\nImport complete.");
-        
-        // Clear the cache again.
-        $this->clearEdgeSideInclude();
-        
-        // Make a Http request and rebuild the Http cache.
-        /*$this->container->get('schedule.cache_helper')
-            ->warmHttpCache(false)
-        ;*/
     }
     
     /**

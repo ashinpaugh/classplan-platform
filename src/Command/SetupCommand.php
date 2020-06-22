@@ -12,8 +12,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 /**
- * Command that should be run after setting the environmental vars
- * in parameters.yml.
+ * Command that should be run after setting the environmental vars in ".env.local".
  * 
  * @author Austin Shinpaugh
  */
@@ -40,8 +39,12 @@ class SetupCommand extends AbstractCommand
 
         $this
             ->setDescription('Initialize the app settings.')
-            ->addOption('import', 'i', InputOption::VALUE_NONE, 'Runs the <info>schedule:import</info> command with the default settings.')
-            ->addOption('reset', '', InputOption::VALUE_NONE, 'Drops the tables currently in the database.')
+            ->addOption(
+                'reset',
+                '',
+                InputOption::VALUE_NONE,
+                'Drops the tables currently in the database.'
+            )
         ;
     }
 
@@ -62,13 +65,7 @@ class SetupCommand extends AbstractCommand
         ;
         
         $output->writeln("\nSetup complete.");
-        
-        if (!$input->getOption('import')) {
-            $output->writeln("Next run <info>php bin/console classplan:import --env=dev -n --no-debug</info> command to populate the database.");
-            return 0;
-        }
-        
-        $this->doImport($output);
+        $output->writeln("Next run <info>php bin/console classplan:import --source=(book|ods) -n --no-debug</info> command to populate the database.");
 
         return 0;
     }
@@ -89,11 +86,10 @@ class SetupCommand extends AbstractCommand
 
         $command = $this->getApplication()->find('assets:install');
         $args    = new ArrayInput([
-            'command' => 'assets:install',
-            '--symlink' => true,
+            'command'    => 'assets:install',
+            '--symlink'  => true,
             '--relative' => true,
-            '--verbose' => true,
-            '--quiet' => true,
+            '--quiet'    => true,
         ]);
 
         $success = 0 == $command->run($args, new NullOutput());
@@ -249,7 +245,6 @@ class SetupCommand extends AbstractCommand
      */
     private function warmCache()
     {
-        // $this->getConsolePath() . ' cache:warmup --env=prod --no-optional-warmers'
         $process = new Process([
             $this->getConsolePath(),
             'cache:warmup',
@@ -260,86 +255,5 @@ class SetupCommand extends AbstractCommand
         $process->run();
         
         return $this;
-    }
-    
-    /**
-     * Runs the schedule:import command.
-     * The command will timeout after three hours.
-     *
-     * @param OutputInterface $output
-     *
-     * @return $this
-     */
-    private function doImport(OutputInterface $output)
-    {
-        $output->writeln("\nRunning import...");
-        
-        $process = new Process(
-            [
-                $this->getConsolePath(),
-                'classplan:import',
-                '--no-debug',
-                '--purge-with-truncate',
-                '--no-interaction',
-            ],
-            null,
-            null,
-            null,
-            (3600 * 3)
-        );
-        
-        $reset = false;
-        $process->run(function ($type, $buffer) use ($output, &$reset) {
-            if (1 === strlen($buffer)) {
-                return;
-            }
-            
-            if (false === strpos($buffer, '%')) {
-                $output->write($buffer);
-                $reset = true;
-            } else {
-                $this->printStreamResponse($buffer, $reset ? 0 : null);
-                $reset = false;
-            }
-        });
-        
-        return $this;
-    }
-    
-    /**
-     * Replace the cli's last message with a new one.
-     * 
-     * @param string $message
-     * @param null   $force_clear_lines
-     * 
-     * @url https://stackoverflow.com/questions/4320081/clear-php-cli-output
-     */
-    private function printStreamResponse($message, $force_clear_lines = null)
-    {
-        static $last_lines = 0;
-    
-        if (!is_null($force_clear_lines)) {
-            $last_lines = $force_clear_lines;
-        }
-        
-        $term_width = exec('tput cols', $toss, $status);
-        if ($status) {
-            $term_width = 64; // Arbitrary fall-back term width.
-        }
-        
-        $line_count = 0;
-        foreach (explode("\n", $message) as $line) {
-            $line_count += count(str_split($line, $term_width));
-        }
-        
-        // Erasure MAGIC: Clear as many lines as the last output had.
-        for ($i = 0; $i < $last_lines; $i++) {
-            // Can be consolodated into
-            echo "\r\033[K\033[1A\r\033[K\r";
-        }
-        
-        $last_lines = $line_count;
-        
-        echo $message."\n";
     }
 }

@@ -2,18 +2,6 @@ parameters:
   building_directory: https://directory.ouhsc.edu/Contacts/BuildingLocations.aspx
 
   building_hash:
-#    FH: Faculty House
-#    # FH: Felgar Hall (13)
-#    LC1: Learning Center
-#    # DEH: Don E. Hogg Greenhouse
-#    # DEH: Devon Energy Hall (7)
-#    SAS: Architectural Studio, SHSC
-#    SPP: Classroom Building, SHSC
-#    SCC: Conference Center, SHSC
-#    SAC: Academic Center, SHSC
-#    LBT: Library - Tulsa
-#    ASC: Academic Support Center, SHSC
-
     AH: Adams Hall
     MFPH: Michael F. Price Hall
     DAH: Dale Hall

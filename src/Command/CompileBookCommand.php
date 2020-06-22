@@ -42,7 +42,7 @@ class CompileBookCommand extends AbstractCommand
             ->addArgument(
                 'folder',
                 InputArgument::REQUIRED,
-                'The full folder path of the files to import.'
+                'The full folder path of the files to import - files should end in <info>.csv</info>.'
             )
             ->addOption(
                 'output_file',
@@ -50,6 +50,13 @@ class CompileBookCommand extends AbstractCommand
                 InputOption::VALUE_OPTIONAL,
                 'The full file path to append to.',
                 realpath(__DIR__ . '/../../datastores/Classes.csv')
+            )
+            ->addOption(
+                'memory',
+                'm',
+                InputOption::VALUE_OPTIONAL,
+                'The memory limit set while running this command.',
+                '2048M'
             )
         ;
     }
@@ -59,7 +66,7 @@ class CompileBookCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        ini_set('memory_limit', '4096M');
+        ini_set('memory_limit', $input->getOption('memory'));
 
         $path        = $input->getArgument('folder');
         $output_path = $input->getOption('output_file');
@@ -71,7 +78,7 @@ class CompileBookCommand extends AbstractCommand
         ;
 
         if (!$finder->hasResults()) {
-            $output->writeln('Files not found in folder.');
+            $output->writeln('No csv files were found in folder: ' . $path);
             return -1;
         }
 
@@ -99,6 +106,14 @@ class CompileBookCommand extends AbstractCommand
         return 0;
     }
 
+    /**
+     * Write the contents of an input file to the output handle.
+     *
+     * @param resource $output_handle
+     * @param string   $file
+     *
+     * @return int
+     */
     protected function appendFile($output_handle, $file)
     {
         $handle = fopen($file, 'r');

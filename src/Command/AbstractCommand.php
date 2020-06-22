@@ -14,11 +14,19 @@ abstract class AbstractCommand extends Command
 {
     protected $project_dir;
 
+    /**
+     * {@inheritDoc}
+     */
     public function __construct(string $name = null)
     {
         parent::__construct($name);
     }
 
+    /**
+     * Set the project's root directory.
+     *
+     * @param KernelInterface $kernel
+     */
     public function setProjectDir(KernelInterface $kernel)
     {
         $this->project_dir = $kernel->getProjectDir();

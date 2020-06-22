@@ -36,12 +36,6 @@ class OnStartFixture extends AbstractDataFixture
         
         // Free up memory.
         $helper->clearLogs();
-        
-        /*
-         * If the command was run manually, the HttpCache won't invalidate
-         * naturally and needs to be purged.
-         */
-        $this->clearEdgeSideInclude();
 
         $import->init();
     }

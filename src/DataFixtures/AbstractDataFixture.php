@@ -24,8 +24,6 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
-use Symfony\Component\Finder\Finder;
 
 /**
  * Abstract class for the data fixtures to extend.
@@ -381,31 +379,5 @@ abstract class AbstractDataFixture extends Fixture implements FixtureInterface, 
     protected function getDoctrine()
     {
         return $this->container->get('doctrine');
-    }
-    
-    /**
-     * Clear the edge side includes so that they no longer server bad data.
-     *
-     * TODO: Is this still necessary?
-     * 
-     * @return $this
-     */
-    protected function clearEdgeSideInclude()
-    {
-        $root       = $this->container->getParameter('kernel.root_dir');
-        $filesystem = $this->container->get('filesystem');
-
-        try {
-            $cache_dirs = Finder::create()
-                ->directories()
-                ->depth(0)
-                ->in($root . '/../var/cache/*/http_cache')
-            ;
-
-            $filesystem->remove($cache_dirs);
-        } catch (DirectoryNotFoundException $exception) {
-        }
-        
-        return $this;
     }
 }

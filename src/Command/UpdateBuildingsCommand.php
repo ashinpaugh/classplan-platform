@@ -10,12 +10,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 
 /**
- * Updates imported building names with their long names.
+ * The default sources reference buildings using their shortnames. This command
+ * attempts to assign human readable names to buildings.
  *
  * @author Austin Shinpaugh
  */
@@ -36,17 +36,16 @@ class UpdateBuildingsCommand extends AbstractCommand
      */
     protected $building_dictionary;
 
-    public function __construct(
-        EntityManagerInterface $doctrine,
-        KernelInterface $kernel
-    ) {
+    public function __construct(EntityManagerInterface $doctrine)
+    {
         parent::__construct('classplan:buildings:update');
 
         $this->doctrine = $doctrine;
-        $this->project_dir = $kernel->getProjectDir();
     }
 
     /**
+     * Container compiler method for setting values stored in the building_config.yaml file.
+     *
      * @param string $directory
      * @param array $dictionary
      */
@@ -65,6 +64,7 @@ class UpdateBuildingsCommand extends AbstractCommand
 
         $this
             ->setDescription('Update the building entities with their full names.')
+            ->setHelp('Buildings listed in TheBook and ODS are referenced by their shortnames. This command assigns human readable names to those shortnames.')
         ;
     }
 
@@ -77,19 +77,26 @@ class UpdateBuildingsCommand extends AbstractCommand
     {
         try {
             $this->doUpdate($output);
-
-            return 0;
         } catch (LogicException $e) {
             $output->writeln($e->getMessage());
             return $e->getCode();
         }
+
+        return 0;
     }
 
+    /**
+     * Run an update to set human readable names of buildings based on the building's shortname.
+     *
+     * Pulls from an online building directory and the building hash parameter found in building_config.yaml.
+     *
+     * @param OutputInterface $output
+     */
     protected function doUpdate(OutputInterface $output)
     {
-        $metadata = $this->getBuildingMeta($output);
+        $metadata  = $this->getBuildingMeta($output);
 
-        $repo = $this->doctrine->getRepository(Building::class);
+        $repo      = $this->doctrine->getRepository(Building::class);
         $buildings = $repo->findAll();
 
         foreach ($buildings as $building) {
@@ -108,6 +115,12 @@ class UpdateBuildingsCommand extends AbstractCommand
         $this->doctrine->flush();
     }
 
+    /**
+     * Building update run wrapper.
+     *
+     * @param OutputInterface $output
+     * @return array|null
+     */
     protected function getBuildingMeta(OutputInterface $output)
     {
         $info = null;
@@ -124,6 +137,8 @@ class UpdateBuildingsCommand extends AbstractCommand
     }
 
     /**
+     * Scrape the buildings directory website.
+     *
      * @return array
      * @throws HttpExceptionInterface
      * @throws ExceptionInterface
@@ -152,6 +167,13 @@ class UpdateBuildingsCommand extends AbstractCommand
         });
     }
 
+    /**
+     * Match the existing building entries with data pulled from the building directory website.
+     *
+     * @param OutputInterface $output
+     * @param Building $building
+     * @param string[] $metadata
+     */
     protected function parseDirectoryListing(OutputInterface $output, Building $building, $metadata)
     {
         if (empty($metadata)) {
@@ -171,6 +193,12 @@ class UpdateBuildingsCommand extends AbstractCommand
         $this->setBuildingMetadata($building, $meta['name']);
     }
 
+    /**
+     * Assign the new values pulled from the directory website and persist.
+     *
+     * @param Building $building
+     * @param string   $full_name
+     */
     protected function setBuildingMetadata(Building $building, $full_name)
     {
         $building->setFullName($full_name);
