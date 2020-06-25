@@ -60,11 +60,14 @@ class OdsImportDriver extends AbstractImportDriver
     {
         $ac_start = null;
         $ac_end   = null;
-        
+
         $this->helper
             ->assignAcademicPoints($ac_start, $ac_end)
         ;
-        
+
+        $ac_start = str_pad($ac_start, 6, '0');
+        $ac_end   = str_pad($ac_end, 6, '0');
+
         /* @var Connection $connection */
         $connection = $this->getDoctrine()->getConnection('ods');
         $statement  = $connection->prepare("
