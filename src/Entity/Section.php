@@ -9,7 +9,9 @@ use JMS\Serializer\Annotation as Serializer;
  * The Section table represents instances of course sections.
  * 
  * @ORM\Entity(repositoryClass="App\Repository\SectionRepository")
- * @ORM\Table(name="section")
+ * @ORM\Table(name="section", indexes={
+ *    @ORM\Index(name="idx_meeting_type", columns={"meeting_type"})
+ * })
  */
 class Section extends AbstractEntity
 {

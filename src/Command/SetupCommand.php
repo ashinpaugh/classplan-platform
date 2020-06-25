@@ -8,7 +8,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -45,6 +44,12 @@ class SetupCommand extends AbstractCommand
                 InputOption::VALUE_NONE,
                 'Drops the tables currently in the database.'
             )
+            ->addOption(
+                'composer',
+                '',
+                InputOption::VALUE_NONE,
+                'Whether to run the composer optimizations.'
+            )
         ;
     }
 
@@ -58,14 +63,15 @@ class SetupCommand extends AbstractCommand
         $this
             ->setupDatabase($output)
             ->wipeSchema($input, $output)
-            ->createSessionsTable($output)
             ->prepareAssets($output)
-            ->generateOptimizedAutoloader($output)
+            ->generateOptimizedAutoloader($input, $output)
             ->warmCache()
         ;
-        
+
         $output->writeln("\nSetup complete.");
-        $output->writeln("Next run <info>php bin/console classplan:import --source=(book|ods) -n --no-debug</info> command to populate the database.");
+
+        // Import needs to be run in dev env because doctrine fixtures aren't loaded in prod.
+        $output->writeln("Next run <info>php bin/console classplan:import --env=dev --source=(book|ods) -n --no-debug</info> command to populate the database.");
 
         return 0;
     }
@@ -147,11 +153,10 @@ class SetupCommand extends AbstractCommand
         $output->writeln("\nWiping table schema...");
         $command = $this->getApplication()->find('doctrine:schema:drop');
         $args    = new ArrayInput([
-            'command'         => 'doctrine:schema:drop',
-            '--quiet'         => true,
-            '--no-debug'      => true,
-            '--force'         => true,
-            // '--full-database' => true,
+            'command'    => 'doctrine:schema:drop',
+            '--quiet'    => true,
+            '--no-debug' => true,
+            '--force'    => true,
         ]);
         
         $command->run($args, new NullOutput());
@@ -159,33 +164,6 @@ class SetupCommand extends AbstractCommand
         $output->writeln("Wipe complete.\n");
 
         $this->createTableSchema($output);
-        
-        return $this;
-    }
-
-    /**
-     * Create the sessions table.
-     *
-     * @param OutputInterface $output
-     *
-     * @return $this
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    private function createSessionsTable(OutputInterface $output)
-    {
-        $connection = $this->doctrine->getConnection();
-        $statement  = $connection->prepare('
-            CREATE TABLE IF NOT EXISTS `sessions` (
-                `sess_id` VARCHAR(128) NOT NULL PRIMARY KEY,
-                `sess_data` MEDIUMBLOB NOT NULL,
-                `sess_time` INTEGER UNSIGNED NOT NULL,
-                `sess_lifetime` MEDIUMINT NOT NULL
-            ) COLLATE utf8_bin, ENGINE = MyISAM;
-        ');
-        
-        $statement->execute();
-        
-        $output->writeln('Sessions table created.');
         
         return $this;
     }
@@ -217,23 +195,28 @@ class SetupCommand extends AbstractCommand
     /**
      * Optimize the composer auto loader.
      *
+     * @param InputInterface $input
      * @param OutputInterface $output
      *
      * @return $this
      */
-    private function generateOptimizedAutoloader(OutputInterface $output)
+    private function generateOptimizedAutoloader(InputInterface $input, OutputInterface $output)
     {
+        if (!$input->getOption('composer')) {
+            return $this;
+        }
+
         $output->writeln('Generating optimized autoloader...');
 
-        $process = Process::fromShellCommandline("$(which composer) dump-autoload -o -a");
+        $command = 'composer dump-autoload -oa';
+        $process = Process::fromShellCommandline($command);
         $process->run();
         
         if (!$process->isSuccessful()) {
-            $output->writeln('Failed!');
-            throw new ProcessFailedException($process);
+            $output->writeln("Failed to run: <error>{$command}</error>");
+        } else {
+            $output->writeln('Autoloader optimized.');
         }
-        
-        $output->writeln('Autoloader optimized.');
         
         return $this;
     }
@@ -249,7 +232,6 @@ class SetupCommand extends AbstractCommand
             $this->getConsolePath(),
             'cache:warmup',
             '--env=prod',
-            '--no-optional-warmers',
         ]);
         
         $process->run();
