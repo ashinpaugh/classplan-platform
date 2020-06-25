@@ -1,12 +1,12 @@
-#ClassPlan
+# ClassPlan
 
 Scheduling utility for the University of Oklahoma.
 
-##Setup
+## Setup
 
 The following database urls can also be set as apache env variables - see the example apache config below.
 
-#####Development
+##### Development
 Create a file named ```.env.local``` with your connection information. See ```.env``` for
 more details. eg:
 
@@ -15,13 +15,13 @@ more details. eg:
 
 CLASSNAV can be set to null if you do not have access to the ODS.
 
-#####Production
+##### Production
 Create a file named ```.env.local``` with your staging credentials. eg:
 
     DATABASE_URL=mysql://USER:PASS@HOST:PORT/DB?serverVersion=5.7
     CLASSNAV_DATABASE_URL=mysql://USER:PASS@HOST:PORT/DB?serverVersion=5.7
 
-####Initialization
+#### Initialization
 Next run composer and the setup commands from the project's root folder:
 
     composer install -oa
@@ -32,12 +32,12 @@ found in ```datastores/Classes.csv```, or if you're on cassapps you can pull fro
 
     php bin/console classplan:import --env=dev --source=(book|ods) -n --no-debug
 
-#####Production
+##### Production
 Consider running the following in a production setting:
 
     php bin/console doctrine:ensure-production-settings
 
-####Example Apache Config
+#### Example Apache Config
 Don't forget any relevant hostfile entries, and to change the environment variables.
 APP_ENV should be either dev or prod.
 
