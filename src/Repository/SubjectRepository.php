@@ -36,6 +36,7 @@ class SubjectRepository extends EntityRepository
               ON s.subject_id = sub.id
             WHERE s.block_id = :block
             GROUP BY sub.id
+            ORDER BY sub.`name`
         ');
 
         $statement->execute(['block' => $block->getId()]);
