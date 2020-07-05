@@ -2,10 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\UpdateLog;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Homepage.
