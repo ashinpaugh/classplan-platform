@@ -47,7 +47,7 @@ class TermController extends AbstractController implements ClassResourceInterfac
     public function cgetAction()
     {
         $terms = $this->getRepo(Term::class)
-            ->findBy([], ['year' => 'DESC', 'semester' => 'ASC'])
+            ->findBy([], ['year' => 'DESC', 'name' => 'ASC'])
         ;
 
         return ['terms' => $terms];

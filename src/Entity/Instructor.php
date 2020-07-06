@@ -39,13 +39,6 @@ class Instructor extends AbstractEntity
     protected $name;
     
     /**
-     * @ORM\Column(name="email", type="string", nullable=true)
-     *
-     * @var String
-     */
-    protected $email;
-    
-    /**
      * Instructor constructor.
      *
      * @param int    $id
@@ -147,26 +140,6 @@ class Instructor extends AbstractEntity
     public function removeSection(Section $class)
     {
         $this->sections->removeElement($class);
-        
-        return $this;
-    }
-    
-    /**
-     * @return String
-     */
-    public function getEmail()
-    {
-        return $this->email;
-    }
-    
-    /**
-     * @param String $email
-     *
-     * @return Instructor
-     */
-    public function setEmail($email)
-    {
-        $this->email = $email ?: '';
         
         return $this;
     }

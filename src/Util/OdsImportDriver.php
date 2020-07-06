@@ -36,18 +36,28 @@ class OdsImportDriver extends AbstractImportDriver
         if ($this->num_rows) {
             return $this->num_rows;
         }
+
+        $this->helper
+            ->assignAcademicPoints($ac_start, $ac_end)
+        ;
+
+        $ac_start = str_pad($ac_start, 6, '0');
+        $ac_end   = str_pad($ac_end, 6, '0');
         
         /* @var Connection $connection */
         $connection = $this->getDoctrine()->getConnection('ods');
         $statement  = $connection->prepare("
-            SELECT COUNT(*)
+            SELECT COUNT(cs.section_id)
             FROM `course_section` AS cs
             WHERE cs.status_code = :status_code
               AND cs.sub_academic_period IS NOT NULL
               AND cs.section_number REGEXP '[0-9]+'
+              AND cs.academic_period BETWEEN :ap_start AND :ap_end
         ");
         
         $statement->bindValue('status_code', 'A', \PDO::PARAM_STR);
+        $statement->bindValue('ap_start', $ac_start, \PDO::PARAM_INT);
+        $statement->bindValue('ap_end', $ac_end, \PDO::PARAM_INT);
         $statement->execute();
         
         return $this->num_rows = $statement->fetchColumn(0);
@@ -72,7 +82,7 @@ class OdsImportDriver extends AbstractImportDriver
         $connection = $this->getDoctrine()->getConnection('ods');
         $statement  = $connection->prepare("
             SELECT
-              cs.academic_period, cs.sub_academic_period,
+              cs.academic_period, cs.sub_academic_period, cs.sub_academic_period_desc,
               
               cs.subject_code, cs.course_number, cs.section_number,
               cs.section_title, cs.course_reference_number, cs.section_id,
@@ -84,7 +94,7 @@ class OdsImportDriver extends AbstractImportDriver
               
               cs.campus_code, mt.building_desc, mt.room,
               
-              cs.instructor1_id, cs.instructor1_email,
+              cs.instructor1_id,
               CONCAT(cs.instructor1_first_name, ' ', cs.instructor1_last_name) AS instructor_name
             FROM `course_section` AS cs
             JOIN `meeting_time` AS  mt
@@ -94,7 +104,6 @@ class OdsImportDriver extends AbstractImportDriver
               AND cs.sub_academic_period IS NOT NULL
               AND cs.section_number REGEXP '[0-9]+'
               AND cs.academic_period BETWEEN :ap_start AND :ap_end
-              AND (mt.start_time IS NOT NULL AND mt.end_time IS NOT NULL)
             ORDER BY cs.academic_period, cs.sub_academic_period
         ");
         
@@ -134,7 +143,7 @@ class OdsImportDriver extends AbstractImportDriver
     public function createRoom(Building $building = null)
     {
         $building = $building ?: $this->createBuilding();
-        $number   = $this->getLocation('room') ?: '0000';
+        $number   = $this->getLocation('room') ?: 'N/A';
         $room     = new Room(
             $building,
             $number
@@ -153,8 +162,8 @@ class OdsImportDriver extends AbstractImportDriver
             (int) $data['instructor1_id'],
             $data['instructor1_id'] ? $data['instructor_name'] : 'N/A'
         );
-        
-        return $instructor->setEmail($data['instructor1_email']);
+
+        return $instructor;
     }
     
     /**
@@ -212,8 +221,8 @@ class OdsImportDriver extends AbstractImportDriver
             ->setDays($entry['meeting_days'])
             ->setStartDate($this->getDate($entry['start_date']))
             ->setEndDate($this->getDate($entry['end_date']))
-            ->setStartTime($entry['start_time'])
-            ->setEndTime($entry['end_time'])
+            ->setStartTime($this->getTime($entry['start_time']))
+            ->setEndTime($this->getTime($entry['end_time']))
             ->setStatus($entry['status_code'])
             ->setNumber($entry['section_number'])
             ->setNumEnrolled($entry['actual_enrollment'])
@@ -252,11 +261,7 @@ class OdsImportDriver extends AbstractImportDriver
         $term  = $data['academic_period'];
         $year  = substr($term, 0, 4);
         $code  = substr($term, 4);
-        $block = $data['sub_academic_period'];
-        
-        if ('EXAM' === $data['meeting_type_code']) {
-            $block = $data['meeting_type_code'];
-        }
+        $block = $data['sub_academic_period_desc'];
         
         return [
             'year'     => $code < 20 ? $year : $year + 1,
@@ -282,7 +287,7 @@ class OdsImportDriver extends AbstractImportDriver
             case 30:
                 return 'Summer';
             default:
-                return 'Unknown';
+                return 'Other';
         }
     }
 }

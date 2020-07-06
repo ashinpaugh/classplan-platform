@@ -64,6 +64,10 @@ class SectionRepository extends EntityRepository
             );
         }
 
+        $query = $query->addOrderBy(
+            $query->expr()->asc('s.number')
+        );
+
         return $query->getQuery()->getResult();
     }
 }
