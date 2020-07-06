@@ -718,6 +718,7 @@ class Section extends AbstractEntity
             case 'CLAS':
             case 'class':
             case 'TRAD':
+            case 'BLND':
                 $this->meeting_type = static::MT_CLASS;
                 
                 return $this;

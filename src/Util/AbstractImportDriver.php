@@ -285,6 +285,18 @@ abstract class AbstractImportDriver
         
         return new DateTime($date);
     }
+
+    /**
+     * Format the time string.
+     *
+     * @param string $time
+     *
+     * @return string
+     */
+    protected function getTime($time)
+    {
+        return empty($time) ? '' : $time;
+    }
     
     /**
      * Set environment variables.
