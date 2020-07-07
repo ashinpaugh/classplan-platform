@@ -57,7 +57,9 @@ class Building extends AbstractEntity
     /**
      * The building's full name.
      *
-     * @ORM\Column(type="string", nullable=true, length=120)
+     * This field is only used when working with TheBook imports.
+     *
+     * @ORM\Column(type="string", nullable=true, length=150)
      * @Serializer\Exclude()
      *
      * @var string
@@ -68,14 +70,15 @@ class Building extends AbstractEntity
      * Building constructor.
      *
      * @param Campus $campus
-     * @param string $name
+     * @param string $abbreviation
+     * @param string $full_name
      */
-    public function __construct(Campus $campus, string $abbreviation, string $code = null, string $name = null)
+    public function __construct(Campus $campus, string $abbreviation, string $full_name = null)
     {
         $this
             ->setCampus($campus)
             ->setShortname($abbreviation)
-            ->setFullName($name)
+            ->setFullName($full_name)
         ;
         
         $this->rooms = new ArrayCollection();

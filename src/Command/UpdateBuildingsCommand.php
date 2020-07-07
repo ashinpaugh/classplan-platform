@@ -17,6 +17,8 @@ use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
  * The default sources reference buildings using their shortnames. This command
  * attempts to assign human readable names to buildings.
  *
+ * This command is only useful when working with book imports.
+ *
  * @author Austin Shinpaugh
  */
 class UpdateBuildingsCommand extends AbstractCommand
@@ -63,8 +65,8 @@ class UpdateBuildingsCommand extends AbstractCommand
         parent::configure();
 
         $this
-            ->setDescription('Update the building entities with their full names.')
-            ->setHelp('Buildings listed in TheBook and ODS are referenced by their shortnames. This command assigns human readable names to those shortnames.')
+            ->setDescription('Update the building entities with their full names. Intended for book imports only.')
+            ->setHelp('(Only for book imports). Buildings listed in TheBook and ODS are referenced by their shortnames. This command assigns human readable names to those shortnames.')
         ;
     }
 
