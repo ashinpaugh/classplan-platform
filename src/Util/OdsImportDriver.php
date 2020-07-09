@@ -94,7 +94,7 @@ class OdsImportDriver extends AbstractImportDriver
               
               cs.campus_code, mt.building_desc, mt.room,
               
-              cs.instructor1_id,
+              cs.instructor1_id AS instructor_id,
               CONCAT(cs.instructor1_first_name, ' ', cs.instructor1_last_name) AS instructor_name
             FROM `course_section` AS cs
             JOIN `meeting_time` AS  mt
@@ -159,8 +159,8 @@ class OdsImportDriver extends AbstractImportDriver
     {
         $data       = $this->getEntry();
         $instructor = new Instructor(
-            (int) $data['instructor1_id'],
-            $data['instructor1_id'] ? $data['instructor_name'] : 'N/A'
+            (int) $data['instructor_id'],
+            $data['instructor_name'] ? $data['instructor_name'] : 'N/A'
         );
 
         return $instructor;
