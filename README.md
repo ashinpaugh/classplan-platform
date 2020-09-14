@@ -66,3 +66,12 @@ APP_ENV should be either dev or prod.
        </Directory>
     
     </VirtualHost>
+
+#### CASAPPS Deployment
+
+    cd /var/www/html
+    git clone git@github.com:ashinpaugh/classplan-platform.git classplan
+    docker exec -it web composer i -oa -d /var/www/html/classplan
+    docker exec -it web php /var/www/html/classplan/bin/console classplan:setup --reset
+    docker exec -it web php /var/www/html/classplan/bin/console classplan:import --source=ods --no-debug -n --env=dev
+    
