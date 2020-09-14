@@ -17,7 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
 class ImportDriverHelper
 {
     /**
-     * @var Registry
+     * @var ManagerRegistry
      */
     protected $doctrine;
     
@@ -201,24 +201,6 @@ class ImportDriverHelper
     }
     
     /**
-     * FK Checks need to be disabled when using TRUNCATE instead of DELETE
-     * during the :fixtures:load command.
-     * 
-     * @param boolean $enabled
-     *
-     * @return int
-     */
-    public function toggleFKChecks($enabled)
-    {
-        $connection = $this->doctrine->getConnection();
-        
-        return $connection->executeUpdate(sprintf(
-            "SET foreign_key_checks = %b;",
-            (int) $enabled
-        ));
-    }
-    
-    /**
      * Get the previous logs. The import command wipes the databases, so
      * fetch them before they are destroyed.
      * 
@@ -274,15 +256,60 @@ class ImportDriverHelper
         return current($logs);
     }
 
+    /**
+     * Getter for the include online classes flag.
+     */
     public function getIncludeOnline(): bool
     {
         return $this->include_online;
     }
 
+    /**
+     * Setter for the include online classes flag.
+     *
+     * @return $this
+     */
     public function setIncludeOnline(bool $include)
     {
         $this->include_online = $include;
 
         return $this;
+    }
+
+    /**
+     * Enable / disable SQL logging.
+     *
+     * @param boolean $enabled
+     *
+     * @return $this
+     */
+    public function toggleSqlLogging(bool $enabled)
+    {
+        $flag       = $enabled ? 'ON' : 'OFF';
+        $connection = $this->doctrine->getConnection();
+
+        $connection->executeUpdate(vsprintf("
+            SET GLOBAL general_log = '%s';
+        ", [$flag]));
+
+        return $this;
+    }
+
+    /**
+     * FK Checks need to be disabled when using TRUNCATE instead of DELETE
+     * during the :fixtures:load command.
+     *
+     * @param boolean $enabled
+     *
+     * @return int
+     */
+    public function toggleFKChecks(bool $enabled)
+    {
+        $connection = $this->doctrine->getConnection();
+
+        return $connection->executeUpdate(sprintf(
+            "SET foreign_key_checks = %b;",
+            (int) $enabled
+        ));
     }
 }

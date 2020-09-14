@@ -74,6 +74,13 @@ class ImportCommand extends AbstractCommand
                 'The memory limit set while running this command.',
                 '4096M'
             )
+            ->addOption(
+                'logging',
+                'l',
+                InputOption::VALUE_OPTIONAL,
+                'Whether to log sql events (mysql general_log).',
+                false
+            )
         ;
     }
 
@@ -103,9 +110,10 @@ class ImportCommand extends AbstractCommand
      */
     protected function loadFixtures(InputInterface $input, OutputInterface $output)
     {
-        $source = $input->getOption('source');
-        $period = $input->getOption('year');
-        $online = $input->getOption('online');
+        $source  = $input->getOption('source');
+        $period  = $input->getOption('year');
+        $online  = $input->getOption('online');
+        $logging = $input->getOption('logging');
 
         $command = $this->getApplication()->find('doctrine:fixtures:load');
         $args    = new ArrayInput([
@@ -124,14 +132,25 @@ class ImportCommand extends AbstractCommand
                 ->toggleFKChecks(false)
             ;
 
-            return $command->run($args, $output);
+            if (!$logging) {
+                $this->importer->toggleSqlLogging(false);
+            }
+
+            $result = $command->run($args, $output);
         } catch (ErrorException $e) {
             $output->writeln('An error occurred: ' . $e->getMessage());
-            return $e->getCode();
+            $result = $e->getCode();
         } catch (Exception $e) {
             $output->writeln('An error occurred executing [doctrine:fixtures:load]: ' . $e->getMessage());
-            return $e->getCode();
+            $result = $e->getCode();
         }
+
+        $this->importer
+            ->toggleSqlLogging(true)
+            ->toggleFKChecks(true)
+        ;
+
+        return $result;
     }
 
     /**
