@@ -285,11 +285,11 @@ class ImportDriverHelper
      */
     public function toggleSqlLogging(bool $enabled)
     {
-        $flag       = $enabled ? 'ON' : 'OFF';
+        $flag       = $enabled ? 'OFF' : 'ON';
         $connection = $this->doctrine->getConnection();
 
         $connection->executeUpdate(vsprintf("
-            SET GLOBAL general_log = '%s';
+            SET sql_log_off = '%s';
         ", [$flag]));
 
         return $this;
