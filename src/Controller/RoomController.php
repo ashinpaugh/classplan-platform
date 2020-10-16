@@ -30,7 +30,7 @@ class RoomController extends AbstractController implements ClassResourceInterfac
      *   @SWG\Parameter(
      *     name="id",
      *     in="path",
-     *     description="The building id.",
+     *     description="The room id.",
      *     required=true,
      *     type="string",
      *     @SWG\Schema(type="integer")
@@ -62,7 +62,7 @@ class RoomController extends AbstractController implements ClassResourceInterfac
      *   @SWG\Parameter(
      *     name="id",
      *     in="path",
-     *     description="The building id.",
+     *     description="The room id.",
      *     required=true,
      *     type="string",
      *     @SWG\Schema(type="integer")
