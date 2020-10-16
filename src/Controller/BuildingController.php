@@ -76,10 +76,13 @@ class BuildingController extends AbstractController implements ClassResourceInte
      */
     public function getAction($idOrName)
     {
-        $params = is_numeric($idOrName) && $idOrName > 0
-            ? ['id' => $idOrName]
-            : ['short_name' => $idOrName]
-        ;
+        if (is_numeric($idOrName) && $idOrName > 0) {
+            $params = ['id' => $idOrName];
+        } else {
+            // Replace any url encoded spaces with real spaces.
+            $idOrName = str_replace('%20', ' ', $idOrName);
+            $params   = ['short_name' => $idOrName];
+        }
 
         $building = $this->getRepo(Building::class)
             ->findOneBy($params)
