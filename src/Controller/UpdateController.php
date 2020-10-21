@@ -57,7 +57,7 @@ class UpdateController extends AbstractController implements ClassResourceInterf
      */
     public function checkAction()
     {
-        $this->doPoll();
+        // $this->doPoll();
 
         return $this->getLastUpdateLog();
     }
