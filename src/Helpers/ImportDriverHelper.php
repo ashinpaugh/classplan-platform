@@ -294,7 +294,7 @@ class ImportDriverHelper
 
         $flag = $enabled ? '1' : '0';
         $connection->executeUpdate(vsprintf("
-            SET SQL_LOG_BIN = '%s';
+            SET SQL_LOG_BIN = %d;
         ", [$flag]));
 
         return $this;
